@@ -1,0 +1,1477 @@
+Everything on Ruby is an object.
+
+Ruby, an OOP and functional programming language with a clean sintax,
+has the following elements:
+
+* Namespaces
+
+  Can be used to reference variables in a module
+
+* Variables
+
+Memory allocations holding data. There are five types supported by
+ruby.
+
+** Global Variables
+
+   Starting with a $, variables available on every
+   scope. Uninitialized global variables return nil.
+
+   Using global variables recommended, they make isolating bugs
+   difficult. So they should only be used when necessary with explicit
+   names.
+
+
+#+BEGIN_SRC ruby
+
+  puts ($im_a_global_variable) # Outputs nil
+  $im_a_global_variable = 5
+  puts ($im_a_global_variable) # Outputs 5
+  # Global variables can be traced when they change, with this function
+  trace_var :$x, proc{print "$x is now ", $x, "\n"}
+
+#+END_SRC
+
+  Some system variables also start with $
+
+** Instance Variables
+
+   Begin with a @, used to define the attributes of something or one
+   class, defining characteristics of a single object. nil if
+   unitialized.
+
+   Instance Variables have a scope of its class.
+
+   Instance variables give objects their own private space to hold
+   data, following OOP.
+
+   Methods do Things, is what an object can do.
+
+   Instance is what that object holds or know.
+
+   We'll create a class Coffee machine, and we want to know how much
+   water is available. Creating a class CoffeeMachine, defining a
+   method which has some data on it.
+
+   #+BEGIN_SRC ruby
+
+     class CoffeeMachine
+       def initialize
+	 @water = 100
+       end
+       def make_coffee
+	 @water -= 10
+       end
+       def print_water_level
+	 puts ("Water level is: #{@water}")
+       end
+     end
+   machine = CoffeeMachine.new
+   machine.print_water_level
+
+   #+END_SRC
+
+   #+RESULTS: 50
+   
+   The second method makes coffee and lowest @water value. In this
+   example, every Coffeemachine object will have its own private value
+   of @water.
+
+   Since instance variables are only accessed by their class, they are
+   encapsulated. Following OOP.
+
+   One can open a window to some instance variable
+
+   #+BEGIN_SRC ruby
+
+     def water
+       @water
+     end
+
+     machine = CoffeeMachine.new
+     machine.water
+
+   #+END_SRC
+
+   #+RESULTS: 50
+
+   We could use an attribute reader:
+
+   #+BEGIN_SRC ruby
+     class CoffeeMachine
+       attr_reader :water
+
+       def initialize
+	 @water = 100
+       end
+     end
+
+     machine = CoffeeMachine.new
+     machine.water
+   #+END_SRC
+
+   #+RESULTS: 100
+
+   Instance variables don't have to be created in the initialize
+   method, but that's how you give them initial value.
+
+   Accessing instance variables with instance_variables_get and such
+   shouldn't be used.
+
+   To get a list of instance variables, use:
+
+   #+BEGIN_SRC ruby
+
+     machine.instance_variables
+
+   #+END_SRC
+
+   #+RESULTS: [:@water]
+   
+   In Rails, instance variables are used to share data between your
+   controllers & views. But you can still use them normally in your
+   classes.
+
+** Class Variables
+
+   Begin with @@. Define attributes to several objects or classes,
+   must be initialized before they can be used in method
+   definitions. Referencing uninitialized class variable produce
+   error.
+
+   #+BEGIN_SRC ruby
+
+     @@classvariable #Static across all instances
+     class Car
+	 @make
+	 @@wheels = 4
+
+	 def initialize(make)
+	     @make = make
+	 end
+
+	 def self.wheels
+	     @@wheels
+	 end
+	 attr_accessor :make
+     end
+
+     #outside the class
+     civic = Car.new("Honda")
+
+     #instance variable, called on the object
+     >>civic.make
+     =>"Honda"
+     #class variable, called on the class itself
+     >>Car.wheels
+     =>4
+
+   #+END_SRC
+
+** Local Variables
+
+   Begin with _ or a lowercase letter. Its scope ranges from class,
+   module, def or do to the corresponding end or from a block's
+   opening brace to its close brace. Uninitialized local variables is
+   interpreted as a call to a method with no arguments. 
+
+   Assignment to uninitialized local variables also serves as variable
+   declaration.
+
+   #+BEGIN_SRC ruby
+
+   local = 5
+
+   #+END_SRC
+
+   local variables scope is limited to the code block they are in, or
+   all the program if they aren't in a code block.
+
+** Constants
+
+   Start with an uppercase letter. They have the same scope as local
+   variables. Referencing uninitialized constant produces error, its
+   contents can't be modified, or Ruby will complain.
+
+   #+BEGIN_SRC 
+
+   Imconstant = 5
+
+   #+END_SRC
+
+** Pseudo-Variables
+
+   Special variables look like local variables, but begave like
+   constants. One can't assign any value to these variables.
+
+   - self :: The receiver object of the current method
+
+   - true :: Represents true state
+
+   - false :: Represents false state
+
+   - nil :: Represents undefined state.
+
+   - __FILE__ :: The name of the current source file.
+
+   - __LINE__ :: The current line number in the source file.
+
+* Object-oriented Programming (OOP)
+
+  An object is both data and function that operate on data. It knows
+  hot to perform certain actions and how to interact with other
+  elements of the program
+
+  A class defines a blueprint of an object. How an object should be,
+  and how it should behave, what instances should it have and what
+  methods it has.
+
+  A method is a procedure associated with a class, which operates on
+  data of the class.
+
+  OOP works following this definitions:
+
+  - Abstraction :: Provide only essential information to the 'outside
+                   world', and hiding unneeded background
+                   details. some methods, for example, won't show all
+                   its data.
+
+  - Encapsulation :: Binds variables, properties and methods into a
+                     single unit, an object. Restricts access to
+                     certain properties or components. Its best
+                     example, a class.
+
+  - Inheritance :: One can create newer classes from a parent class,
+                   these newer classess will inherit its parent's
+                   methods and instances. But one can difference
+                   between this children by its differences (own
+                   methods or instances).
+
+  - Polymorphism :: Depending on the type of object that invokes the
+                    function, one will have a different result. A
+                    function can have different forms.
+
+* Methods
+
+  The following function creates a method which can take a parameter,
+  its default value being World. 
+  
+  #+BEGIN_SRC ruby
+
+  def hi(name = "World") 
+  puts "Hello #{name.capitalize}!"
+  end
+  
+  #+END_SRC
+
+  #+RESULTS:
+  : Hello World!
+
+  #{x} converts x into a string if it isn't one already, then it
+  #substitutes the outer string at that point.
+
+  Methods bundle actions that an object can take. A method without
+  parameters can be called by its name without parentheses.
+
+  def method_name(var1, var2)
+
+  Calling this method by: method_name 23, 30
+
+  Calling a method with parameters without default values will give us
+  error. By default, methods return a value. This value being the
+  value of the last statement.
+
+  #+BEGIN_SRC ruby
+
+    def test
+      i = 1
+      w = 2
+      r = 0
+    end
+
+  #+END_SRC
+
+  #+RESULTS:
+  : 0
+
+  We could also use return to specify the returned value.
+
+  If more than two expressions are given, the returned value will be
+  an array of those values. If no expression given, nil will be
+  returned.
+
+  #+BEGIN_SRC ruby
+
+     def sample (*test)
+       puts "The number of parameters is #{test.length}"
+       for i in 0 ...test.length
+	 puts "The parameters are #{test[i]}"
+       end
+     end
+     sample "Zara", "6", "F"
+     sample "Mac", "36", "M", "MCA"
+
+  #+END_SRC
+
+  #+RESULTS:
+  : The number of parameters is 3
+  : The parameters are Zara
+  : The parameters are 6
+  : The parameters are F
+  : The number of parameters is 4
+  : The parameters are Mac
+  : The parameters are 36
+  : The parameters are M
+  : The parameters are MCA
+
+  To see what methods a class responds to:
+
+  #+BEGIN_SRC ruby
+
+  greeter.respond_to?("name")
+  => false 
+  There's no 'name' method
+
+  greeter.respond_to?("say_hi")
+  => true
+  There is a 'say_hi' method
+
+  greeter.respond_to?("to_s")
+  => true
+  to_s method is also existent
+  
+  #+END_SRC
+
+  say_hi and to_s convert something to a string, they are default in
+  every object.
+
+  To access object variables, we should call the class:
+
+  #+BEGIN_SRC ruby
+
+    class Greeter
+      attr_accessor :name
+    end
+
+    greeter = Greeter.new("Someone")
+    => #<Greeter"0x3c9b0 @name="Andy">
+
+    greeter.respond_to?("name")
+    => true
+
+    greeter.respond_to?("name=")
+    => Someone
+
+    greeter.say_hin
+    Hi Someone!
+    => nil
+
+  #+END_SRC
+  
+  attr_accessor defines two new methods, name to get the value and
+  name= to see it.
+
+  Methods are usually attached to the end of variables and constants
+  by a dot, like front_door.open, being open the method. Methods can
+  also be chained together, like so: front_door.open.is_open?.close
+
+  Some methods may require more information in order to perform its
+  action, this arguments are attached to the end of a method. 
+  
+  front_door.paint( :red )
+
+  Methods with arguments can also be chained:
+
+  front_door.paint ( 3, :red ).dry( 30 ).close()
+
+  Some methods (print) are kernel methods, these are used throughout
+  Ruby. Since they are so common, you won't use a dot.
+
+  print "No dot"
+
+  Greeter.instance_methods gives us a list of methods we defined plus
+  ancestor methods.
+  
+** Class Methods
+   
+   Method residing on a class level, and instance method resides on
+   the object level.
+
+* Classes
+  
+  Objects are instances of the class. We can create objects in Ruby
+  using the method new of the class. new, belongs to the class
+  methods, so one can apply it to all classes.
+
+  initialize is a special type of method which will be exeucted when
+  the new method of the class is called.
+  
+  Creating non constant classes is not permitted. An instance variable
+  should be used in order to read its value, if a local value is used
+  instead, its scope won't allow it to be readed.
+
+* Iterator
+  Method which accepts a block or a Proc object, used to produce
+  user-defined control structures -- especially loops.
+
+  #+BEGIN_SRC ruby
+
+    data = [1, 2, 3]
+    data.each do |i|
+      puts i
+    end
+
+  #+END_SRC
+
+  #+RESULTS:
+  | 1 | 2 | 3 |
+
+  The each method of the array data is passed the do .. end block, and
+  executes it repeatedly. On each call, the block is passed successive
+  elements of the array.
+
+* Symbols
+
+  'Lightweight strings', used when you need a string you won't be
+  printing it to the screen. :a, :b.
+
+  We can convert a string into a symbol using intern.
+
+* Arrays
+
+  Data structure representing a list of values called
+  elements. Multiple data that can be referenced under a single
+  name. Arrays are objects with their own methods.
+
+  #+BEGIN_SRC ruby
+
+    # Instead of:
+
+    email1 = "ceo@example.com"
+    email2 = "admin@example.com"
+    email3 = "support@example.com"
+    email4 = "sales@example.com"
+
+    # Use this:
+
+    emails = [
+      "ceo@example.com",
+      "admin@example.com",
+      "support@example.com",
+      "sales@example.com"
+    ]
+    
+    print emails
+
+  #+END_SRC
+
+  #+RESULTS:
+  : list of emails
+
+  There are two sintaxes when creating arrays:
+
+  #+BEGIN_SRC ruby
+
+    days = %w{Monday Tuesday Wednesday Thursday Friday Saturday Sunday}
+
+    # OR
+
+    days =  ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+  #+END_SRC
+  
+  The length method helps us find out how many elements an array has,
+  if we use days.length, it'll return 7. To find out the index of an
+  element, use index. Using days.index("Thursday") returns 3. If
+  there's no such element, a nil will be returned.
+
+  To get the last element, we use days[-1]. It'll return sunday. We
+  could use methods for this, first and last.
+
+  Uninitialized array return nil. We add values with the push
+  method. Or another syntax as days << "Something". To add something
+  to the beginning, we use the unshift() method.
+
+  To delete something, using the method delete_at will need an index,
+  or just delete() and a value. Delete removes all elements containing
+  the value specified.
+
+  There are two ways of iterating through arrays. Here we say: for
+  each element in the sharks array, add the value to the local
+  variable shark and execute the following code:
+
+  #+BEGIN_SRC ruby
+
+    sharks = ["Hammerhead", "Great White", "Tiger", "Whale"]
+    for shark in sharks do
+      puts shark
+    end
+
+  #+END_SRC
+
+  #+RESULTS:
+  | Hammerhead | Great White | Tiger | Whale |
+
+  Another way is using a method:
+  
+  #+BEGIN_SRC ruby
+
+    sharks = ["Hammerhead", "Great White", "Tiger", "Whale"]
+    sharks.each do |shark| 
+      puts shark
+    end
+
+    #For a short syntax:
+
+    sharks.each {|shark| puts shark }
+
+  #+END_SRC
+
+  #+RESULTS:
+  | Hammerhead | Great White | Tiger | Whale |
+
+* Hashes
+  
+  Collection of key-value pairs. Indexing is done via arbitrary keys
+  of any object type, not an integer index as an arrat. One can
+  traverse a hash by either key or value. Attempting to access an
+  inexistnet key hash return nil. There are several ways of hash
+  creation:
+
+  #+BEGIN_SRC ruby
+
+  {'a' => 'something', 'b' => 'bee', "red" => 0xf00}
+
+  months = Hash.new
+
+  months = Hash.new( "month" )
+  #Or
+  months = Hash.new "month"
+
+  puts "#{months[0]}"
+  puts "#{months[72]}"
+
+  #+END_SRC
+
+  #+RESULTS:
+  : month | month
+
+  One can use any object as a key or value, even an array.
+
+  [1, "jan"] => "January"
+
+* Regexp
+
+  Regexp are used to find words or patterns in text. For example,
+  using regexp one can define what a valid email address is and what
+  isn't. The following returns the indexof the first occurrence of the
+  word if it was found, if not it'll return nil. If we don't want the
+  index, we could use the String#include? method.
+  
+  #+BEGIN_SRC ruby
+
+    # Find the word like
+
+    "Something" =~ /like/
+
+    if "Something".match(/like/)
+      puts "Match Found!"
+    end
+
+  #+END_SRC
+
+  #+RESULTS:
+  : nil
+
+** Character Classes
+
+   Lets you define a range or a list of characters to match. For
+   example, [aeiou] matches any vowel:
+
+   #+BEGIN_SRC ruby
+
+     def contains_vowel(str)
+       str =~ /[aeiou]/
+     end
+     contains_vowel("test") # returns 1
+     contains_vowel("sky")  # returns nil
+
+   #+END_SRC
+
+   Or use ranges to specify something:
+
+   - [0-9] specifies all numbers from 0 to 9
+   - [a-z] specifies all letters
+   - [^a-z] Negated range
+
+   In this example, we'll see if the string is a IP address, using !!
+   to convert the value returned into a boolean:
+
+   #+BEGIN_SRC ruby
+
+     def ip_address?(str)
+       # We use !! to convert the return value to a boolean
+       !!(str =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)
+     end
+     ip_address?("192.168.1.1")  # returns true
+     ip_address?("0000.0000")    # returns false
+
+   #+END_SRC
+
+   #+RESULTS:
+   : false | true
+
+* Operators
+
+  + represents addition
+  - Substraction
+  * Multiplication
+  / Division
+  % Modulus, returns remainder of a division
+  ** Exponent
+
+  ** !  ~  *  /  %  +  -  &
+  << >> |  ^  >  >= <  <= <=>
+  || != =~ !~ && += -= == ===
+  .. ... not and or
+
+** Comparison Operators
+
+   == True if both values are equal
+   != True if values are not equal
+   >  True if left operand is greater than right operand(RO)
+   < True if left operand is less than RO
+   >= True if left operand is greater than or equal to RO
+   <= True if left operand is less than or equal to RO
+   <=> Returns 0 if first operant equals second, 1 if first operand is
+   greater than the second and -1 if first operant is less than
+   second.
+   === Test equality within a when clause of a case statement.
+   (1...10 === 5 returns true.
+
+   .eql? True if receiver and argument have both the same type and
+   equal values.
+   1 == 1.0 is true, 1.eql?(1.0) is false for different types.
+
+   equal? True if receiver and argument have the same object id.
+
+   if aObj is a duplicate of bObj then is true.
+   a.equal?bObj is false but a.equal?aObj is true.
+
+
+** Assignment Operators
+
+   = Assign values to left from right
+   += Result of adding left and right values
+   -= Result of substracting left and right values
+   *=
+   /=
+   %=
+   **=
+
+** Parallel Assignment
+
+   Enables to assign multiple variables at one. Instead of:
+    
+   a = 10
+   b = 20
+   c = 30
+    
+   We use: 
+
+   a, b, c = 10, 20, 30
+
+   We can also swap values:
+
+   a, b = b, c
+
+** Bitwise Operators
+
+   Works on bits and performs bit by bit operation.
+   if a = 60 and b = 13, in binary format we have:
+
+    a    =  0011 1100
+    b    =  0000 1101
+    ------------------
+    a&b  =  0000 1100
+    a|b  =  0011 1101
+    a^b  =  0011 0001
+    ~a   =  1100 0011
+
+    | Operator | Description                                                                                                   | Example                                  |
+    |----------+---------------------------------------------------------------------------------------------------------------+------------------------------------------|
+    | &        | AND, copies a bit to the result if it exists in both operants                                                 | (a & b) will give 12, which is 0000 1100 |
+    | pipe     | OR, Copies a bit if it exists in either operant                                                               | (a pipe b) will give 61                  |
+    | ^        | XOR, copies the bit if it is set in one operand but not both                                                  | (a ^ b) will give 49                     |
+    | ~        | Binary Ones Complement Operator is unary, flips bits                                                          | (~a) will give -61                       |
+    | <<       | Binary Left Shift Operator, Left operands are moved left by the number of bits specified by the right operand | a << 2 will give 240                     |
+    | >>       | Operands moved right by the number of bits specified by the right operand                                     | a >> 2 will give 15                      |
+     
+** Logical Operators
+
+   | Operator  | Description                                | Example                 |
+   |-----------+--------------------------------------------+-------------------------|
+   | and       | True if both operands true                 | (true and true) is true |
+   | or        | true if Any of both operands are non zero  | (a or b) is true        |
+   | &&        | true if both operands are non zero         | (a && b) is true        |
+   | pipe pipe | True is any of two operands are non zero   | (a pipe pipe b) is true |
+   | !         | Reverses logical state, if true then false | !(a && b) is false      |
+   | not       | If confition is true, then false           | not(a && b) is false |
+    
+* Built-in Ruby
+
+  and     BEGIN   begin   break   case    class   def     defined
+  do      else    elsif   END     end     ensure  false   for     if
+  in      module  next    nil     not     or      redo    rescue  retry
+  return  self    super   then    true    undef   unless  until   when
+  while   yield
+  
+* Alias 
+  
+  Aliases give something a second name. It can be used to provide more
+  expressive options to the programmer using the class or to help
+  override methods and change the behavior of the class or object.
+
+  Making aliases for numbered global variables ($1, $2,...) is
+  prohibited. Overriding the built-in global variables may cause
+  problems.
+
+  We can use undef and alias to modify independently from the
+  superclass a class.
+
+#+BEGIN_SRC ruby
+
+  alias method-name method-name
+  alias gloabl-variable-name global-variable-name
+
+  alias foo bar
+  alias $MATCH $&
+   
+  undef method-name
+
+  undef bar
+
+#+END_SRC
+
+* Blocks
+
+  Blocks group a set of instructions together so that they can be
+  passed around your program.
+  
+  Block arguments are undefined variables that are going to be used
+  inside the block.
+  
+  { |x,y| x + y }
+
+  you can define blocks with { ... } in place of do ... end. It means
+  the same, However, in some cases, precedence issues cause them to
+  act differently.
+
+  { ... } binds more tightly to the preceding expression than does a
+  do ... end block. The first example is equivalent to foobar(a, b) do
+  ... end, while the second is foobar (a, b { ... }).
+ 
+* Modules 
+
+  A dot is used to identify the receiver of a message, The message is
+  received by sqrt, Math is just where is sqrt.
+   
+  Math, mathematic operations: Math.sqrt(9) = 3
+
+  Everything in Ruby is an object
+
+  __FILE__ is a variable representing the name of the current file. 
+
+  $0 is a variable representing the name of the file used to start the
+  program.
+
+  Using  __FILE__ == $0 in a file means that if that file is executed
+  directly, run some code, if not, do not. This allows us to use the
+  file as a library.
+
+  In Unix systems, the first line should be: #!/usr/bin/ruby
+
+  IRB stands for Interactive Ruby, a terminal interface for ruby.
+
+  puts a basic command for printing on ruby, always returns nil, which
+  is Ruby's absolutely-positively-nothing value.
+
+  Modules group similar methods together under a familiar name. 
+
+  One can access any variable or constant value by putting a '#' just
+  before that variable or constant.
+
+  'each' is a method that accepts a block of code, then runs a block
+  of code for every element in a list. Think of the block as an
+  anonymous function or lambda.
+
+  To navigate and deal with files and directories, use the dir class.
+  
+* Basic Literals
+** Integers
+        
+   123                  # Fixnum decimal
+   1_234                # Fixnum decimal with underline
+   -500                 # Negative Fixnum
+   0377                 # octal
+   0xff                 # hexadecimal
+   0b1011               # binary
+   ?a                   # character code for 'a'
+   ?\n                  # code for a newline (0x0a)
+   12345678901234567890 # Bignum
+
+** Floating Numbers
+
+   123.4                # floating point value
+   1.0e6                # scientific notation
+   4E20                 # dot not required
+   4e+20                # sign before exponential
+
+** String Literals
+
+   Sequences of 8-bit bytes and they are objects of class
+   String. Double-quoted string allow substitution and backslash
+   notation.
+
+   To substitute a value in a expression into a string, we use #{
+   expr }. Everything between the braces is turned into a string, if
+   it already isn't.
+
+   We can used Backslash notations to represent actions, like '\n'
+   being a Newline.
+    
+* Examples
+
+Here we define a program that can take arguments, lists and says hello
+depending on the situation.
+
+  #+BEGIN_SRC ruby
+
+    class MegaGreeter
+      attr_accessor :names
+
+      # Create the object
+      def initialize(names = "World")
+	@names = names
+      end
+
+      def say_hi
+	if @names.nil?
+	  puts "..."
+	elsif @names.respond_to?("each")
+	  # @names is a list of some kind, iterate!
+	  @names.each do |name|
+	    puts "Hello #{name}!"
+	  end
+
+	else
+	  puts "Hello #{@names}!"
+	end
+      end
+
+      def say_bye
+	if @names.nil?
+	  puts "..."
+	elsif @names.respond_to?("join")
+    # Join the list elements with commas
+	    puts "Goodbye #{@names.join(", ")}. Come back soon!"
+	  else
+	    puts "Goodbye #{@names}. Come back soon!"
+	  end
+	end
+      end
+
+      if __FILE__ == $0
+	mg = MegaGreeter.new
+	mg.say_hi
+	mg.say_bye
+
+	# Change name to be "Zeke"
+	mg.names = "Zeke"
+	mg.say_hi
+	mg.say_bye
+
+	# Change the name to an array of names
+	mg.names = ["Albert", "Brenda", "Charles", "Dave", "Engelbert"]
+	mg.say_hi
+	mg.say_bye
+
+	mg.names = nil
+	mg.say_hi
+	mg.say_bye
+      end
+
+  #+END_SRC
+
+  Some string methods are:
+
+  #+BEGIN_SRC ruby
+
+    number = 5
+    print number.next # prints 6
+
+    phrase = 'wishing for something'
+    print phrase.length # prints '19'
+
+    todays_wishes = WishMaker.new
+    todays_wishes.grant( "something" )
+
+    print 5.class # Integer
+    print 'wishing something'.class # String
+    print Wishmaker.new.class # prints 'WishMaker'
+
+  #+END_SRC
+
+  Some Hash usage example:
+
+   #+BEGIN_SRC ruby
+
+     hsh = colors = { "red" => 0xf00. "green" => 0x0f0, "blue" => 0x00f }
+     hsh.each do |key, value|
+       print key, " is ", value, "\n"
+     end
+
+     # Gives us;
+     # red is 3840
+     # green is 240
+     # blue is 15
+
+   #+END_SRC
+
+* LaunchSchools ruby
+
+Ruby is written in C.
+
+** Instance Methods vs Class Methods
+
+   For example, if we create a string, we'll be able to put any
+   instance methods from the String class in the documentation. If we
+   want to put any class methods, we'll have to call it by its class,
+   for example:
+
+   #+BEGIN_SRC ruby
+
+   # instance method
+   "This word will be split in an array".split
+  
+   #+END_SRC
+
+   #+RESULTS:
+   | This | word | will | be | split | in | an | array |
+
+   #+BEGIN_SRC ruby
+
+   # class method
+   String.new("blue") # new will receive the "blue"
+
+   #+END_SRC
+
+   Any class is a subclass, with class instances, class methods and
+   even Methods included.
+
+** Ruby Gems
+  
+   They can be a collection of Ruby files, or Ruby library that perform
+   a certain task. Or the publishing system that is behind organizing,
+   listing and publishing those libraries, or gems.
+
+   pry is a good gem for debugging, when installed we can use it like:
+
+   #+BEGIN_SRC ruby
+
+     # preparation.rb
+     require "pry"
+
+     a = [1, 2, 3]
+     a << 4
+     binding.pry     # execution will pause here, allowing you to inspect all objects
+     puts a
+
+   #+END_SRC
+
+** Type Conversion
+
+   #+BEGIN_SRC ruby 
+
+   '4'.to_f
+  
+   #+END_SRC
+
+   #+RESULTS:
+   : 4.0
+
+   #+BEGIN_SRC ruby 
+
+   "12".to_i
+  
+   #+END_SRC
+
+   #+RESULTS:
+   : 12
+
+   #+BEGIN_SRC ruby
+  
+   12.to_s
+  
+   #+END_SRC
+
+   #+RESULTS:
+   : 12
+
+** Getting data from the user
+
+   For this, we use the function gets, it expects input from the user
+   and stops when the user goes 'enter'.
+
+   #+BEGIN_SRC ruby
+  
+   name = gets.chomp
+   "Bob"
+   return "Bob"
+  
+   #+END_SRC
+
+   #+RESULTS:
+   : Bob
+
+   .chomp makes the string returned to be just Bob, if not putted, the
+   string will be Bob\n representing the enter key.
+
+   *Mutating callers with .pop*
+
+** Arrays
+
+   To eliminate the last element of an array:
+
+   #+BEGIN_SRC ruby :session arraymod
+
+   something = [1,2,3,4,5]
+   something.pop
+   something
+  
+   #+END_SRC
+
+   #+RESULTS:
+   | 1 | 2 | 3 | 4 |
+
+   To add something at the end, use .push or << to mutate the caller.
+  
+   The .map method iterates over an array applying a block to each
+   element of the array and returns a new array with those results. The
+   irb session below shows how to use map to get the square of all
+   numbers in an array. The .collect method is an alias to map - they do
+   the same thing.
+
+   To delete something in a position, use .delete_at(index). By value,
+   use .delete()
+
+   .uniq method iterates through an array and eliminates duplicate
+   values.
+
+   using ! suffix like .uniq! makes the process destructively, and
+   changes the value of the array.
+
+   .select is similar to .each, but it iterates and runs a code,
+   returning a new array with the values that return true.
+
+   Common methods for an array class are:
+
+   .include? checks if a value exists in an array
+
+   .flatten create a one-dimentional array from an array with nested
+   arrays.
+
+   .each_index iterates and returns index instead of the values inside
+   those indexes.
+
+   .each_with_index gives us the ability to manipulate both the value
+   and the index by passing in two parameters to the block of code. The
+   first is the value and the second is the index. You can then use
+   them in the block.
+
+   .sort orders an array, where 1 , 3, 2. Using sort will make the
+   array 1, 2, 3.
+
+   .product combines two arrays in an interesting way:
+
+   #+BEGIN_SRC ruby
+
+   [1, 2, 3].product([4, 5])
+  
+   #+END_SRC
+
+   #+RESULTS:
+   | 1 | 4 |
+   | 1 | 5 |
+   | 2 | 4 |
+   | 2 | 5 |
+   | 3 | 4 |
+   | 3 | 5 |
+  
+** Hashes
+
+   Arrays order elements by index, Hashed order elements by key and
+   value. 
+
+   #+BEGIN_SRC ruby
+
+     old_syntax_hash = {:name => 'bob'}
+     person = { height: '6 ft', weight: '160 lbs' }
+
+     ## to add something to an existing hash
+
+     person[:hair] = 'brown'
+     person[:age] = 62
+
+     ## To remove something of an existing hash
+
+     person.delete(:age)
+
+     ## To retrieve information by key
+
+     person[:weight]
+
+     ## To merge
+
+     person.merge!(new_hash)
+
+     # To Iterate
+
+     person = {name: 'bob', height: '6 ft', weight: '160 lbs', hair: 'brown'}
+
+     persorn.each do |key, value|
+       puts "Bob's #{key} is #{value}"
+     end
+
+     {"height" => "6 ft"}     # string as key
+
+     {["height"] => "6 ft"}   # array as key
+
+     {1 => "one"}             # integer as key
+
+     {45.324 => "forty-five point something"}  # float as key
+
+     {{key: "key"} => "hash as a key"}  # hash as key
+
+   #+END_SRC
+
+   Some common hash methods are:
+
+   .has_key? checks if a key is existent, if so, return true
+   .select Allows to run a code and return any key-value pairs that
+   pass true on the code given.
+   .fetch returns the value if a given key is existent, we can pass
+   code that will be run if the key is nil.
+   .to_a returns an array version of your Hash, creating and array
+   inside an array for every value.
+   .keys returns all keys of a hash
+   .values return all values of a hash
+
+** Regexp
+
+   Used to match a sequence of characters.
+
+   Here we use =~ operator to check for a match.
+
+   #+BEGIN_SRC ruby
+
+   "powerball" =~ /b/
+  
+   #+END_SRC
+
+   #+RESULTS:
+   : 5
+
+** Exception handling
+
+   Handles errors with the Exception class.
+
+   #+BEGIN_SRC ruby
+
+   # exception_example.rb
+
+   begin
+   # perform some dangerous operation
+   rescue
+   # do this if operation fails
+   # for example, log the error
+   end
+
+   #+END_SRC
+
+   #+BEGIN_SRC ruby
+
+     # exception_example.rb
+
+     names = ['bob', 'joe', 'steve', nil, 'frank']
+
+     names.each do |name|
+       begin
+	 puts "#{name}'s name has #{name.length} letters in it."
+       rescue
+	 puts "Something went wrong!"
+       end
+     end
+
+   #+END_SRC
+
+   We've used a begin/rescue/end block to handle any exceptions that
+   may happen within our block. In this example, we have a nil value in
+   our array. Therefore, when we go to call .length on nil we get an
+   error. When an exception, or error, is raised, the rescue block will
+   execute and then the program will continue to run as it normally
+   would. If we didn't have the rescue block there, our program would
+   stop once it hit the exception and we would lose the rest of our
+   print-out.
+
+   Using rescue as a reserverd word-in-line:
+
+   #+BEGIN_SRC ruby
+
+     zero = 0
+     puts "Before each call"
+     zero.each { |element| puts element } rescue puts "Can't do that!"
+     puts "After each call"
+
+   #+END_SRC
+
+   Here we raise an error if the divisor is 0:
+
+   #+BEGIN_SRC ruby
+
+     def divide(number, divisor)
+       begin
+	 answer = number / divisor
+       rescue ZeroDivisionError => e
+	 puts e.message
+       end
+     end
+
+     puts divide(16, 4)
+     puts divide(4, 0)
+     puts divide(14, 7)
+
+   #+END_SRC
+
+** Exercises  
+
+   1. Use the each method of Array to iterate over [1...10], and print out each value.
+
+   #+BEGIN_SRC ruby
+
+     one_to_ten = [1,2,3,4,5,6,7,9,10]
+
+     one_to_ten.each do |number| puts number  end
+
+   #+END_SRC   
+
+   #+RESULTS:
+   | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 9 | 10 |
+   
+   2. Same of above, but only printing out values greater than 5.
+
+   #+BEGIN_SRC ruby :results output 
+
+     one_to_ten = [1,2,3,4,5,6,7,9,10]
+     one_to_ten.each {|number| puts number if number > 4 }
+
+   #+END_SRC      
+
+   #+RESULTS:
+   : 5
+   : 6
+   : 7
+   : 9
+   : 10
+   
+   3. With the same array, use select to extract odd numbers into a new array
+      
+   #+BEGIN_SRC ruby 
+
+     one_to_ten = [1,2,3,4,5,6,7,9,10]
+
+     one_to_ten.select { |number| number % 2 == 1 }
+
+   #+END_SRC   
+
+   #+RESULTS:
+   | 1 | 3 | 5 | 7 | 9 |
+
+   4. Append 11 to the end of the original array, and 0 to the beginning
+
+   #+BEGIN_SRC ruby
+
+     one_to_ten = [1,2,3,4,5,6,7,9,10]
+
+     one_to_ten.push(11)
+
+     one_to_ten.unshift(0)
+
+   #+END_SRC
+
+   #+RESULTS:
+   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 9 | 10 | 11 |
+
+   5. With a hash, remove all key-value pairs whose value is less than 3.5
+
+   #+BEGIN_SRC ruby
+
+     h = { a:1, b:2, c:3, d:4 }
+
+     h.delete_if { |k, v| v < 3.5 }
+
+   #+END_SRC
+   
+   6. Write a program that display the current time.
+
+      For this, we use the Time class
+
+   #+BEGIN_SRC ruby
+
+     time = Time.new
+
+   #+END_SRC
+
+   #+RESULTS:
+   : 2020-02-20 14:36:25 -0500
+
+* Koans
+
+  First, we need to check the file text_assert_truth. Here we'll
+  examine the code and check what's wrong. The first line of code we
+  see if a require:
+
+  #+BEGIN_SRC ruby
+
+  require File.expand_path(File.dirname(__FILE__) + '/neo')
+
+  #+END_SRC
+
+  As we know here, __FILE__ is a pseudo-variable, containing the name
+  of the file. The require follows two class methods, let's cover
+  that.
+
+  .expand_path gives us the absolute path of something, using it in
+  the directory ~/something will return us /home/something.
+
+  .dirname, as its name implies, gives us the directory name of
+  __FILE__, the current file. These two methods return strings.
+
+  So this code means: require an absolute path of the directory name
+  of the current file plus /neo. basically /home/$user/koans/neo.
+
+  Then we create a new class, which will inherit everything from the
+  class Koan, it being inside the module Neo.
+
+  #+NAME: beginning
+  #+BEGIN_SRC ruby 
+
+  class AboutAsserts < Neo::Koan
+
+  #+END_SRC
+  
+  Then, we define a module with assert, it makes sure that the
+  condition is true. Then, we just change all the asserts to be
+  true. And we're done with this file.
+  
+  
+   
+
+
+
+
+* railstutorial.org/book/beginning
+
+** Model View Controller (MVC)
+
+   Architectural pattern that enforces separation between data in the
+   application (user information) and the code used to display it.
+
+   The controller handles the request us the browser (user), and
+   decides to wheter, show a view, or connect to the model and thus,
+   to the database to retrieve information.
+
+** Version Control with Git
+
+   Version control systems allow s to track changes to our projects
+   code, collaborate more easily and roll back any inadvertent
+   errors. To use it, we need to make oa one-time setup, configure our
+   name and e-mail.
+
+   #+BEGIN_SRC bash
+   git config --global user.name "Your name"
+   git config --global user.email youremail@gmail.com
+   #+END_SRC
+
+   We can make git remember our password for one day:
+   
+   #+BEGIN_SRC bash
+   git config --global credential.helper "cache --timeout=86400"
+   #+END_SRC
+
+   To tell git to start working on a directory:
+
+   #+BEGIN_SRC bash
+   git init
+   #+END_SRC
+   
+   To add all project files to git:
+
+   #+BEGIN_SRC bash
+   git add -A
+   #+END_SRC
+   
+   The added files are placed in the staging area, which contains
+   changes to our project. TO see changes, run git status. To keep any
+   made changes, use git commit.
+
+   We can see a list of commit changes with the git log command.
+
+   Any changes we made will change our working tree, but if we want to
+   record them, we should commit, if a critical file is deleted, you
+   can roll back. To do this, use git checkout -f
+
+   We can also push our project into Github, to do this:
+
+   #+BEGIN_SRC bash
+   git remote add origin https://github.com/$USER/$project.git
+   git push -u origin master
+   #+END_SRC
+
+   Branches are copies of a repository where we can make changes
+   without modifying the parent files. Normally, the parent repository
+   is the master branch, we can create a new topic branch by
+   using checkour with the -b flag:
+   
+   #+BEGIN_SRC bash
+   git checkout -b development
+   git branch
+   #+END_SRC
+
+   the first command creates a branch and switchs to it, the second
+   only lists branches and shows our working one.
+
+   When commiting, we could use git add -A, but we could also use the
+   -a flag as a shortcut for the case of committing all modifications
+   to existing files. -a doesn't add files to the commit, only changes
+   from existent files.
+
+   To merge, we should:
+
+   #+BEGIN_SRC bash
+   git checkout master
+   git merge development
+   #+END_SRC
+   
+   After merging, we can delete the created branch with:
+   
+   #+BEGIN_SRC bash
+   git branch -d development
+   #+END_SRC
+   
+   To push any changes to GitHub, we just call git push.
+
+   
+
+
+

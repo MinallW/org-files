@@ -1,0 +1,642 @@
+* How does the Web Work?
+
+  Ip addresses are needed to find a certain server. Your computer is a
+  Client, you are not directly connected to the internet, you are
+  connected to the internet indirectly by an Internet Service Provider
+  (ISP). 
+
+  A simple network or a simple communication between two computers,
+  always need to be linked either physically or wirelessly. A network
+  though, is not limited to two computers, but to how many computers
+  you want it to connect. In order for any PC not to be connected to
+  each one. We use routers.
+
+  Routers have only one job: Makes sure that a message sent from a
+  given computer arrives at the right destination computer.
+
+  A web page is a document which can be displayyed by a web browser. 
+
+  A website is a collection of web pages grouped together and
+  connected together in various ways.
+
+  A web server is a comoputer that hosts a website on the Internet.
+  
+  A Search Engine helps you find other web pages.
+
+  Computers connected to the web are called clients and servers. The
+  client requests, and the server provides.
+
+  Clients are any device capable of connecting to a server and asking
+  for something.
+
+  Servers are computers that store webpages, sites or apps. When a
+  client device wants to access a webpage, a copy of the webpage is
+  downloaded from the server onto the client machine to be displayed
+  in the user's web browser.
+
+  Your internet connection provides a route into a destination.
+
+  TCP/IP is a protocol that allows data to travel safely from source
+  to destination.
+
+  Domain Name Servers are like an address book for websites.
+
+  Hypertext Transfer Protocol (HTTP) is an application protocol that
+  defines a language for clients and servers.
+
+  Component files are different files that a website is made of. they
+  come in Code files, built primarily from HTML, CSS and JavaScript or
+  Assets, all other stuff such as images, music, videos, word
+  documents or PDFs.
+
+  If websites were sent as single big chunks, only one user could
+  download one at a time, that's why every data has to be sent as
+  small chunks, packets.
+
+  A protocol is stateless when it's designed in such a way that each
+  request/response pair is completely independent of te previous
+  one. Stateful being the oposite, it treats a simple request/response
+  requests as a part of a large communication process.
+
+  HTTP being a stateless protocols has a good impact on server
+  resources and ease of use. It means that the server does not need to
+  hang on to information, or state, between requests. So when a
+  request breaks en route to the server, no part of the system has to
+  do any cleanup. This makes HTTP a resilient protocol, as well as a
+  difficult protocol for building stateful applications.
+
+  A simple URL with a query string looks like:
+
+  http://www.example.com?search=ruby&results=10
+
+  the http can be replaced by other protocols such as ftp, mailto or
+  git.
+
+  A port can follow the host, before .com for example, we can add
+  ':88' if we don't want to use the default port, but the 88 port.
+  
+  The path, what file do you want '/example.html'
+
+  We can also use query strings, such as ?item=book, this is used to
+  send data to the server.
+
+  | Query String Component | Description                                                              |
+  |------------------------+--------------------------------------------------------------------------|
+  | ?                      | Reserved character, marks the start of the query string                  |
+  | search=ruby            | Parameter name/value pair.                                               |
+  | &                      | Reserver character, used when adding more parameters to the query string |
+  | results=10             | name/value pair parameter                                              |
+  
+  For example, the following URL:
+
+  http://www.phoneshop.com?product=iphone&size=32gb&color=white
+  
+  This is asking the host to narrow down on a product iphone size 32gb
+  and color white. How the server uses these parameters is up to the
+  server side application.
+
+  Performing a search in any modern search engine, passes query
+  strings through the URL, they are only used in HTTP GET requests.
+
+  Any URL typed on the address bar of your browser is a HTTP GET
+  request. Except by some minor exceptions.
+
+  Query Strings are great to pass in additional information to the
+  server, however, there are some limits to the use of query strings:
+
+  - They have maximum lenght. If you have lots of data to pass on,
+    you'll not be able to do it with query strings.
+
+  - The name/value pairs used in query strings are visible in the
+    URL. Though, passing sensitive information in this manner is not
+    recommended.
+
+  - Space and special characters like & canot be sed with query
+    strings. They must be URL encoded.
+
+** URL Encoding
+
+   By default, URLs are designed to accep only cerain characters in
+   the ASCII character set. Characters not in this set as well as
+   reserved or unsafe characters are not used, so they have to be
+   encoded.
+
+   URL encoding replaces these non-conforming characters with a %
+   symbol followed by two hexadecimal digits that represent the ASCII
+   code of the character.
+
+   | Character | ASCII code | URL                                             |
+   |-----------+------------+-------------------------------------------------|
+   | Space     |         20 | http://www.shop.com/shops/tommy%20hilfiger.html |
+   | !         |         21 | http://www.shop.com/moredesigns%21.html         |
+   | +         |         2B | http://www.shop.com/shops/spencer%2B.html       |
+   | #         |         23 | http://www.shop.com/%23somequotes%23.html       |
+   
+   Characters must be encoded if:
+
+   - Tey have no corresponding character within the ASCII character
+     set.
+
+   - The use of the character is unsafe because it may be
+     misinterpreted, or even possibly modified by some systems. % is
+     unsafe because it can be used for encoding other
+     characters. Other unsafe characters are <, >, [, ]. {, }, ~, #.
+
+   - The character is reserved for special use within the URL
+     scheme. They have special meaning so their presence in a URL
+     server a specific purpose, such as /, ?, :, @ and & are
+     reserved. & is reserver for use as a query string delimited. : Is
+     reserve to delimit host/port components and user/password.
+
+   Paw 3 is a GUI HTTP tool, alternatives are Insomnia and Postman,
+   available for free.
+
+   Curl is a free command line tool that is used to issue
+
+   
+   
+** Making HTTP Requests
+
+   Making an HTTP request is easiest as enter a page as reddit or
+   google.
+
+   The server hosting these sites handles your request and issues a
+   response back to your browser. Your browser process this response
+   and displays the site.
+
+   Browsers shows us the processed version of the response, in order
+   to see a raw response, we should use an HTTP tool.
+
+   In order to become a web developer, you'll need to learn to read
+   and process raw HTTP response data just by scanning it. We can dig
+   into raw data and do some debugging and see exactly what's in the
+   response.
+
+   Some sites need you to add an User-Agent to our HTTP
+   request. Otherwise, it will deny our request, assuming the request
+   originates from a bot. We can append the following to any curl
+   commands.
+   
+   -A 'User-Agent: Mozilla/5.0 (Macintosh: Intel Mac OS X 10_9_5)
+   AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.101
+   Safari/537.36'
+
+   The -A option specify a User-Agent for an HTTP request when using
+   curl.
+
+   $ curl -X GET "https://www.reddit.com/" -m 30 v
+
+   We'll see one request and one response containing the HTML, but no
+   additional requests being automatically issued.
+
+** Request Methods
+
+   The method used, the HTTP Request Method tells the server what
+   action to perform on a resource. The most common HTTP request
+   methods are GET and POST.
+
+   Retrieving information, think GET, the most used request
+   method. Note that every request gets a response, even if the
+   response is an error.
+
+   
+** GET Requests
+
+   Initiated by a tool or a browser connecting to a server. it ask the
+   web browser to go retrieve the resource at that address. In curl it
+   will be:
+
+   $ curl -X GET "https://www.reddit.com/" -m 30 -v
+
+** POST Requests
+
+   In order to submit data to the server, we'll have to use POST. Used
+   when you want to initiate some action on the server, or send data
+   to a server. In curl:
+
+   $ curl -X POST "https://google.com" -m 30 -v
+
+   Tipically within a browser, you use POST when submitting a form,
+   POST requests allows us to send much larger and sensitive data to
+   the server. For example, sending username and password through GET
+   means that we'll have to use the URL which is insecure.
+
+   Using POST request in a form fixes this problem. POST requests help
+   the query string size limitation that you have with GET
+   requests. With POST requests, we can send significantly larget
+   forms of information to the server.
+
+   $ curl -X POST "http://www.google.com" -d "player_name=Migl" -m 30
+   -v
+
+   How is the data we're sending being submitted to the server since
+   it's not being sent through the URL? The answer is the HTTP
+   body. It contains the data that is being transmitted in an HTTP
+   message and is optional. Int other words, an HTTP message can be
+   sent with an empty body. When used, the body can contain HTML,
+   images, audio and so on. Body is a letter enclosed in an envelope,
+   to be posted.
+
+   The POST request generated by the HTTP tool or curl is the same as
+   you filling out the form in the browser, submitting that form, and
+   then being redirected to the next page. The key piece of
+   information that redirects us dto the next page is specified in the
+   field 'Location: http://page.com/page. Location and its associated
+   data is part of what is known as an HTTP response header. Your
+   browser sees the response header and automatically issues a brand
+   new request to the URL specified in the location header, thereby
+   initiating a new, unrelated request.
+
+** HTTP Headers
+
+   HTTP headers allow the client and the server to send additional
+   information during during the request/response HTTP cycle. Headers
+   are colon-separated name-value pairs that are sent in plain text. 
+
+** Request Headers
+
+   Request Headers give more information about the client and the
+   resource to be fetched. Some useful request headers are:
+
+   | Field Name      | Description                                | Example                          |
+   |-----------------+--------------------------------------------+----------------------------------|
+   | Host            | The domain name of the server              | Host: www.google.com             |
+   | Accept-Language | List of acceptable languages               | Aceept-Language: en-US, en;q=0.8 |
+   | User-Agent      | A string that identifies the client        | User-Agent:Mozilla/5.0...        |
+   | Connection      | Type of connection the client would prefer | Connection: keep-alive           |
+   
+   Request headers are a part of the request being sent to the server.
+
+** Status Code
+
+   The HTTP status code is a three digit number that the server sends
+   back after receiving a request signifying the status of the
+   request. The status text displayed next to status code provides the
+   description of the code. Listed in the Status column.
+
+   The most common response status code is 200, which means the
+   request was handled succesfully.
+
+   | Status Code | Status Text           | Meaning                                                                                       |
+   |-------------+-----------------------+-----------------------------------------------------------------------------------------------|
+   |         200 | OK                    | The request was handled successfully.                                                         |
+   |         302 | Found                 | The requested resource has changed temporarily. Usually returns in a redirect to another URL. |
+   |         404 | Not Found             | The requested resource cannot be found.                                                       |
+   |         500 | Interval Server Error | The server has encountered a generic error.                                                   |
+   
+   
+** 302 Found
+
+   When a resource is moved, the most common strategy is to re-route
+   the request from the original URL to a new URL. This is called a
+   redirect.
+   
+   When your browser sees a response status code of 302, it knows that
+   the resource has been moved, and will automatically follow the new
+   re-routed URL in the Location response header.
+
+   For example, we want to access our account profile at
+   github on the address https://github.com/settings/profile. However,
+   in order to have access to the profile page, you must first be
+   signed in. If not, the browser will send you to a page to do that,
+   that page is on the Location header. After entering your
+   credentials, you'll be redirected to the original page you were
+   trying to access. 
+
+   Compared this situation with an HTTP tool, which doesn't
+   automatically follow the redirect.
+
+   In the raw HTTP request, Location will have a returning page to
+   redirect you after getting your credentials.
+   
+** 404 Not Found
+   
+   Requested resource cannot be found. A resource can be anything,
+   including audio files, CSS stylesheets, JavaScript files, images,
+   etc.
+
+** 500 Internal Server Error
+
+   This says 'there's something wrong on the server side'. It is a
+   generic error status code and the core problem can range from a
+   mis-configured server setting to a misplaced comma in the
+   application code. Wathever the problem, it's a server side issue.
+
+   
+** Response Headers
+
+   Responde headers offer more information about the resource being
+   sent back. 
+   
+   | Header Name      | Description                              | Example                               |
+   |------------------+------------------------------------------+---------------------------------------|
+   | Content-Encoding | The type of encoding used on the data    | Content-Encoding: gzip                |
+   | Server           | Name of the server                       | Server:thin 1.5.0 codename Knife      |
+   | Location         | Notify client of a new resource location | Location: Redirectedpage.com          |
+   | Content-Type     | Type of data that the response contains  | Content-Type:text/html; charset=UTF-8 |
+
+   Response headers contain additional meta-information about the
+   response data being returned.
+
+   As stated before, HTTP protocol is stateless, it doesn't hang on to
+   information between each request/response cycle.
+
+   Each request made to a resource is treated as a brand new entity,
+   and different request aren't grouped together, or aware of each
+   other. This Behavior allows us to build stateful web applications.
+
+   A web app can maintain its state, that's why we don't have to log
+   in all the time we update facebook page or others,  the server
+   response contains HTML that still shows our username.
+
+   There are some methods used on the client to make displaying
+   dynamic content easy, some of them are:
+
+   - Sessions
+   - Cookies
+   - Asynchronous JavaScript calls, or AJAX
+
+** Sessions
+
+   A stateless HTTP protocol is being augmented to maintain a sense of
+   statefulness. With some help from the client, HTTP can be made to
+   act as if it were maintaining a stateful connection with the
+   server, even though it's not. One way to accomplish this is by
+   having the server send some form of a unique token to the client.
+   
+   Whenever a client makes a request to that server, the client
+   appends this token as part of the request, allowing the server to
+   identify clients. We call this unique token that gets passed back
+   and forth the session identifier.
+
+   This creates a sense of persistent connection between requests,
+   however it's still stateless and unaware of the previous or the
+   next request.
+
+   This approach has some consequences, every request must be
+   inspected to see if it contains a session identifier, and if it
+   does, the server mush check to ensure that this session id is still
+   valid. The server needs to maintain some rules with regards to how
+   to handle session expiration and also decide how to store its
+   session data. The server also needs to retrieve the session data
+   based on the session id. And recreate the application state from
+   the session data and send it back to the client as the response.
+
+   This is adding more work to the server.
+
+** Cookies
+
+   A cooie is a picec of data that's sent from the server and stored
+   in the client during a request/response cycle. Cookies or HTTP
+   cookies are small files stored in the browser and contain the
+   session information. The client side cookie is compared with the
+   server-side session data on each request to identify the current
+   session. This way, when you visit the same website again, your
+   session will be recognized because of the stored cookie with its
+   associated information.
+
+   When first entering a cookie enabled website, the website will give
+   you, the client, a cookie. You'll save that cookie.
+
+   When entering the website again, you'll have a cookie, you'll
+   present this cookie with your GET request, and the website will
+   identify your client.
+
+   In the server side, this session data is stored on memory, other
+   times, it could be stored in persistent storage, like a database or
+   key/value store. 
+
+   Cookies are the most used for making web applications work around
+   the statelessness of HTTP.
+
+** AJAX
+
+   Asynchronous JavaScript and XML allows browsers to issue requests
+   and process responses without a full page refresh. It's expensive
+   for a server to generate every photo and status present it in a
+   timeline for you, and generate that for every request.
+
+   When AJAX is used, all request sent from the client are performed
+   asynchronously, which means that the page doesn't refresh.
+
+   Google is a good example, opening the network tab on your browser,
+   and starting to search something, you'll see that several requests
+   are created along the way.
+
+   Every letter you type is issuing a new request, AHAX request is
+   triggered with every key-press. The responses from these requests
+   are being processes by some callback. Callback being a piece of
+   logic you pass on to some function to be executed afgter a certain
+   event has happened. The callback is triggered when the response is
+   returned. The callback processing these asynchronous requests and
+   responses is updating the HTML with new search results. 
+
+   AJAX request are just like normal ones, they are sent to the server
+   with al the normal components of an HTTP request, and the server
+   handles them like any other requuest. The difference betwen browser
+   refresing and processing the response is that the response is
+   processed by a callback function, which is usually somje
+   client-side JavaScript code.
+   
+   
+** Security HTTP, Secure HTTP (HTTPS)
+
+   As the client and server send request and responses to each other,
+   all the information is sent by strings. A malicious hacker attached
+   somehow to the same network, they could employ packet sniffing
+   techniques to read the messages being sent back and forth. As we
+   learned previously, requests can contain the session id, which
+   uniquely identifies you to the server, if someone else copied this
+   session id, they could craft a request to the server and pose as
+   your client, being automatically logged in without even having
+   access to your username or password.
+
+   HTTPS helps this by encrypting every request/response being
+   transported on the network. If this information is sniffed, it
+   would be encrypted and useless.
+
+   HTTPS sends messages using a cryptographic protocol called
+   TLS. earlier versions used Secure Sockets Layer (SSL) until TLS was
+   developed. The protocol use certificates to communicate with remote
+   servers and exchange security keys before data encryption happends.
+
+** Same-origin policy
+
+   This permits unrestricted interaction between resources only if
+   they originate from the same source, but restricts certain
+   interactions between resources originating from different sources.
+
+   Same-origin policy doesn't rescrit all cross-origin
+   requests. Requests such as linking, redirects or form submissions
+   to different origins are typically allowed. Also embedding of
+   resources from other origins, such as scripts, css stylesheets,
+   images and other media. What is tipically restricted are
+   cross-origin requests where resources are being accsses
+   programmatically using APIs such as XMLHttpRequest or fetch.
+
+   While securte, it's an issue for web developers who have need for
+   making restricted kinds of cross-origin requests. Cross-origin
+   resource sharing (CORS) was developed to deal with this issue. It
+   allows interactions that would normally be restricted cross-origin
+   to take place. It adds new HTTP headers, which allow servers to
+   serve resources cross-origin to certain specified origins.
+
+   The same-origin policy is an important guard agains session
+   hijacking attacks and serves as a cornerstone of web application
+   security.
+
+** Session Hijacking
+
+   Sessions play an important role in keeping HTTP stateful, they are
+   unique tokens used to identify different sessions. This id is
+   implemented as a random string and omes in the form of a cookie
+   store on the computer. If an attacker gets hold of the session id,
+   he could access the web app on the users session without knowing
+   the username or password of the client.
+
+   Resetting sessions is a great way to battle Session Hijacking, this
+   means a succesful login must render an old session id invalid and
+   create a new one.On the next request, the victim will be required
+   to authenticate. At this point, the altered session id will change,
+   stopping the attacker, this is implemented in some sites that ask
+   you to authenticate again for sensitive information or area such as
+   charging a creditr card or deleting an account.
+
+   Expiration time on sessions are useful since the hacker won't have
+   an infinite amount of time to pose as the real user.
+
+   Using HTTPS helps since the client's ID will be encrypted an
+   unusable by an attacker.
+
+** Cross-Site Scripting (XSS)
+
+   This type of arrack happends when you allow users to input HTML or
+   JavaScript that ends up being displayed by the site directly.
+
+   For example, a form that allows comments to be write on, so they
+   can then be displayed later on the site.
+
+   This form is just a normal HTML <textarea>, users are free to input
+   anything into the form. But what about users adding raw HTML and
+   JavaScript into the text area and submit it to the server?
+
+   If the server side code doesn't do any sanitization of input, the
+   user input will be injected into the page contents, and the browser
+   will interpret the HTML and JavaScript and execute it.
+
+   Attackers can craft ingeniously malicious HTML and JavaScript and
+   be very destructive to both the server and future client s of the
+   page.
+
+   An attacker can use JavaScript to grab the session ID of every
+   future visitor of this site and then come back and assume their
+   identify. Malicious code would bypass the same-origin policy
+   because the code lives on the site.
+
+   By making sure to sanitize user input, you can eliminate
+   problematic input such as <script> tags, or disallowing HTML and
+   JavaScript input altogether in favor of a safer format, like
+   Markdown, this prevents XSS.
+
+   You can also escape all user input data when displaying it. If you
+   do need to allow users to input HTML and JavaScript, then when you
+   print it out, make sure to escape it so that the browser does not
+   interpret it as code.
+
+   To escape a character means to replace an HTML character with a
+   combination of ASCII characters.
+
+   
+** The Front End
+
+   Get familiar with major client-side (browser-based) languages like
+   HTML, CSS and JavaScript.
+
+   When entering a page through a browser, your browser will receive
+   an HTML file, which probably will tell the browser to request an
+   CSS file an a JavaScript file as well, or more languages such as
+   PHP.
+
+   Each of these languages performs a separate but very important
+   function, they determine how the web page is STRUCTURED(HTML), how
+   it LOOKS(CSS) and how it FUNCTIONS(JavaScript). your browser
+   handles figuring out how to make these files into a functioning web
+   page, the server only provides the files.
+
+   Front-end web development is not design, it does apply the work of
+   designers to the web page by translating their layouts into real
+   code. The front-end developer stands between the designer on one
+   end and the back-end developer on the other, translating the design
+   into code and plugging the data from the back-end developer. He
+   must also handle all the possible interactions that the user may
+   need to make with the page.
+
+   You're building their gateway to your page or product. This may
+   mean gaining a string understanding of accesibility and responsivbe
+   delopment down the line.
+
+   Front-end web development is a mix of programming and layout that
+   powers the visuals and interactions of the web.
+
+   Fron-end design visuals and functions that will interact with the
+   client, the back-end wb developer will develop things that won't
+   interact with the client, but are very important.
+
+** HTML
+
+   HyperText markup Language is a document format used for defining
+   the semantic structure of a single web page. HTML will always
+   contain:
+
+   #+BEGIN_SRC html
+
+     <html>
+       <head>
+	 <title>Example Page</title>
+       </head>
+
+       <body>
+	 <h1>Contents of the page</h1>
+       </body>
+     <html>  
+
+   #+END_SRC
+   
+   <html> begins HTML code. The HTML document as a whole.
+   <head> Contains the header of the document, meta-data and
+   information about the document, and some not part of the document
+   itself.
+
+   <body> contains data that will be shown on the page. All the page
+   content.
+
+   HTML only defines semantic structure of a document, it says nothing
+   about the visual representation of. All visual representation as
+   font, spacing or size of letters and such are made by CSS.
+
+   HTML being a markup language, it marks up certain parts of the
+   content with its structural meaning.
+
+   There are a lot of useful applications, that leverage the
+   information that is provided by defining the semantic structure of
+   a document, one could apply different "themes", as in styles, to
+   the same HTML page depending on people's preferences.
+
+   A website ocnsists of many files and content, we need ot assemble
+   these files into a sensible structure on the server, and make sure
+   they cna talk to one another.
+
+   Its good to name folders and files only on lowercase with no
+   spaces. This is because:
+
+   - Many computers are case-sensitive.
+   - Browsers, web servers, and programming languages do not handle
+     spaces consistently. If you use spaces in your filename, some
+     systems may treat the filename as two filenames. Some servers
+     replace spaces with its ASCII code, resulting in all your links
+     being broken. It's better to separate words with dashes, rather
+     than underscores.
+
+        
+
+   

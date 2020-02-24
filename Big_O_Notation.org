@@ -1,0 +1,293 @@
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
+#+TITLE: Big O notation
+
+* Introducción
+
+  ¿Qué diferencia a un buen programador a un programador cualquiera?,
+  su código. El primero piensa en cosas como optimización, minimalismo
+  y en la lectura de su código.
+
+  Te presentaré un termino importante en Data Sciense, trabaja con
+  análisis de sensibilidad, búsqueda de binarios y un ejemplo con
+  números Fibonacci. Si eso sono como mandarín, no te preocupes, lo
+  explicaré de la manera más sencilla posible.
+
+  /aún/ no sabemos que significa este gráfico, pero estúdiale:
+
+  [[https://cdn-media-1.freecodecamp.org/images/1*KfZYFUT2OKfjekJlCeYvuQ.jpeg]]
+
+** Definiciones usadas
+
+   - Algoritmo :: Función en tu programa
+   - Tipos de datos :: Integers, strings, arrays, etcétera.
+
+   Uno de los campos de estudio de la Data Science, es el cálculo de
+   algoritmos en un grupo de datos muy grande, a esto se le llama
+   análisis de sensibilidad.
+
+   Es, simplemente, en un grupo de datos muy grande, aplicar la mejor
+   búsqueda de binarios posible, esta última siendo el algorítmo
+   depende a la situación.
+
+   Aquí es dónde viene la Big-O Notation, una manera de calcular la
+   complejidad y el tiempo que tarda un algoritmo en completarse. Para
+   esto utiliza diferentes funciones que se adecúan a la situación.
+
+   Hagamos un ejemplo, en un array del [1...10], si quieres obtener un
+   valor, digamos 7, te pregunto:
+
+   ¿Cuál es la manera mas rápida par obtener el valor 7?, ¿Ubicandolo
+   por Index o iterando por todo el array?.
+
+   La respuesta es obvia, ya de por si iterar por cada elemento suena
+   como mucho trabajo, igual para la computadora, si retornar el 7 por
+   index tarda 0.1 segundos, entonces iterar tarda 0.5 segundos. Algo
+   mínimo si me preguntas.
+
+   Sin embargo, esto toma importancia de acuerdo  lo grande del array,
+   en una array de [1...100000], si retornamos un valor por index,
+   tardará 0.1 segundos, mientras que iterando, tardara 15
+   minutos. ¿Gran diferencia no?.
+
+   La Big-O notation utiliza funciones con los siguientes elementos:
+
+   - O :: Tiempo que tarda la operación, llamemoslo el runtime.
+   - n :: Los datos que daremos como parámetro, o que tan largo es la
+          lista o array.
+   - log :: Representa un logaritmo aplicado.
+
+   Además de esto, hay que decir que la Big-O notation solo clacula el
+   peor tiempo posible, con esto me refiero a, que si estamos
+   calculando el tiempo que tarda una obtener el tiempo total de
+   obtener un valor en el array [1...10], estaremos calculando en el
+   caso de que queramos el valor 9.
+
+   Igualmente, en el array [1...100], calcularemos el tiempo en que
+   busquemos el valor 99. Esto es una manera de saber el la peor
+   situación a la que se puede presentar tu logaritmo.
+
+   Además de esto, mientras esté explicando las diferentes funciones
+   de Big-O notation, notarás que una se ve más rápida que otra, sin
+   embargo, ninguna funcion es en sí más ráipida, si no que depende de
+   la situación  reglas en las que se esté usando.
+
+   Una vez definicido esto, pasemos a las funciones
+
+** O(1)
+
+   Representa que, el tiempo será siempre el mismo independientemente
+   de que tan grande es la array, por eso no vemos n en esta función.
+
+   Por ejemplo, si estuvieramos obteniendo un valor sabiendo su index,
+   por lo que no nos interesa si la array es [1...10] o [1...100]. Ya
+   que siempre tardará 0.2 segundos para encontrar el index y retornar
+   el resultado.
+
+   Su representación en código sería:
+   
+   #+BEGIN_SRC ruby :results output
+
+   # Simplemente damos su posicion
+   some_array = [1,2,3,4,5,6,7,8,9,10]
+   puts some_array[6]
+   
+   #+END_SRC
+
+   #+RESULTS:
+   : 7
+
+   [[https://lukasmestan.com/assets/images/o-1.png]]
+
+** O(n)
+
+   El runtime es proporcional al tamaño del array, por ejemplo en un
+   array de [1...10], el runtime será 10 segundos, en un array de
+   [1..100], 100 segundos.
+
+   Un ejemplo de esto es iterar entre cada elemento hasta encontrar el
+   resultado.
+
+   Su representación en código sería una iteración:
+
+   #+BEGIN_SRC ruby :results output
+
+   some_array = [1,2,3,4,5,6,7,8,9,10]
+   some_array.each {|item| puts item}
+   
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+   1
+   2
+   3
+   4
+   5
+   6
+   7
+   8
+   9
+   10
+   #+end_example
+
+   [[https://lukasmestan.com/assets/images/o-n.png]]
+
+** O(log(n))
+
+   Representa aplicar un logaritmo en el array. Por ejemplo, si
+   queremos retornar el valor de 88 en el array [1...100], podemos
+   hacer un logaritmo que busque un número 87> y <89. 
+
+   Para dar un mejor ejemplo, comparemos O(n) y O(log(n)). Demos un
+   ejemplo con cartas.
+
+   Si quisieras adivinar que carta escogio alguien, el primer
+   algoritmo sería como preguntar, carta por carta, hasta dar con el
+   resultado. Mientras que la función con logaritmo, sería más
+   acertado, al preguntar: ¿es un número par?, ¿qué color es?,
+   ¿simbolo?.
+
+   Por lo que, el logaritmo estará más cerca de la respuesta más
+   rápido que ir de preguntando de carta en carta.
+
+   Su representación en código sería un logaritmo cualquiera:
+
+   #+BEGIN_SRC ruby :results output
+
+   some_array = [1,2,3,4,5,6,7,8,9,10]
+
+   if some_array.length == 10 
+   puts some_array[5]
+   end
+   
+   #+END_SRC
+
+   #+RESULTS:
+   : 6
+
+   [[https://lukasmestan.com/assets/images/o-log-n.png]]
+
+** O(n (log (n))
+
+   Según los anteriores logaritmos, este significa, iterar en un
+   elementos, aplicar un logatirmo en dicho elementos, y seguir.
+
+   Esto puede ser útil si, por ejemplo, para encontrar un buen
+   resultado, es necesario hacer pruebas posteriores. En el poe caso
+   es más lento que O(log n), sin embargo, puede ser más exacto en su
+   respuesta. Cada una Como dije anteriormente, cada una de las
+   funciones son usados en diferentes situaciones.
+
+   Su representación en código sería una iteración más un logaritmo:
+
+   #+BEGIN_SRC ruby :results output
+
+     some_array = [1,2,3,4,5,6,7,8,9,10]
+
+     some_array.each do |item|
+       if item == 7
+	 puts item
+       end
+     end
+
+   #+END_SRC
+
+   #+RESULTS:
+   : 7
+
+**  O(n^2)
+
+   El runtime es proporcional a lo grande del array multiplicados a la
+   dos, en un array de [1...10], tomará 20 segundos, mientras que en
+   uno de [1...20], tomará 40 segundos. Si n = 5, el resultado
+   sería 25.
+
+   Su representación en código, es una iteración doble:
+
+   #+BEGIN_SRC ruby :results output
+
+     some_array = [1,2,3,4,5,6,7,8,9,10]
+
+     some_array.each do |item|
+       while item < 5
+	 puts item
+       end
+     end
+
+   #+END_SRC
+
+   [[https://lukasmestan.com/assets/images/o-n2.png]]
+
+** O(2^n)
+
+   El runtime, es exponencial, si n = 5, el resultado sería 32.
+
+   En esta función, gráficamente comienza lento, y luego aumenta
+   exponencialmente, un ejemplo de esto son los números fibonacci.
+
+   Los números fibonacci consisté en que el siguiente número es igual
+   a la suma de los dos números anteriores, por ejemplo:
+
+   1, 2, 3, 5, 8, 13, 21...
+
+   Entonces, se podría decir que los números Fibonacci auentan
+   exponencialmente, tal y cómo nuestra función. Su representación en
+   código sería también, con los números fibonacci:
+
+   #+BEGIN_SRC ruby results :output
+
+     some_array = [1,2,3,4,5,6,7,8,9,10]
+     some_array.each do |item|
+       if item = 1
+	 return 1
+       else
+	 return (item(item -1))(item(item -2))
+       end
+     end
+
+   #+END_SRC
+
+** O(!n)
+
+   Prueba 'todo' para llegar al resultado, esto puede ser confuso,
+   pero un gran ejemplo es el problema del vendedor ambulante.
+
+   El vendedor tiene que ir a diferentes ciudades (n), en cada ciudad
+   hay diferentes calles y conexiones entre ellas, ¿Cuál sería la
+   manera más eficiente de viajar sin repetir sus pasos?.
+
+   Para resolver este problema, esta función calcula cualquier
+   posición posible, se podría decir que gasta tiempo calculando casos
+   los cuales no tienen sentido.
+
+   Luego, obtiene la mejor solución posible y la presenta.
+
+   En este ejemplo, se presentan diferentes resultados, pero la
+   función tarda 'ordenando' esos resultados, esto les lo que hace
+   nuestra función. Un ejemplo en código sería representar el problema
+   del vendedor ambulante:
+
+   #+BEGIN_SRC ruby :results output
+
+     some_array = [1,2,3,4,5,6,7,8,9,10]
+     some_array.each do |item|
+     =begin
+     Código representando las calles y sus distancias, 
+     luego de ese código, calcular la mejor ruta con menor distancia
+     =end
+       return mejor-ruta
+       # Mejor ruta es el resultado de todos los procesos, sin embargo,
+       # ya se gasto procesamiento y tiempo calculando los demás
+     end
+
+   #+END_SRC
+   
+
+
+
+   Si vamos más a fondo, encontrámos que estás funciones representan
+   logaritmos famosos para el ordenamiento de datos en Data Science,
+   veamos algunos:
+   
+
+   
