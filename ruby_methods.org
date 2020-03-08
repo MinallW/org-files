@@ -1,0 +1,37 @@
+In Ruby, every object is an instance of a class, an instance is an object
+created from a class. Here we'll talk about access control.
+
+It's a way of limiting the access of other objects, whether or not they were
+inherited in the same class, or if they're not even related, to an object's
+methods.
+
+There're three types of methods used to set access control, public, protected
+and private.
+
+* Public Methods
+
+  These are methods by default, and will also be inherited to newer objects, for
+  example, a public method of a class person called speak, means that every
+  instance of that class will also have a speak method.
+  
+  They are called using the receiver and the method, for example>
+  anotherPerson.speak
+     ^            ^
+  Receiver     Method
+
+* Private Methods
+
+  Methods defined after a -private- keyword, can only be used by the class which
+  they we're written. For example, if I create a Person class and add a private
+  method, this method won't be inherited and can only be used calling
+  Person.private_method.
+
+  One can call private methods defining a public method that calls it though.
+  You define private methods when they shouldn't be used externally. Its
+  receiver is always it's defining class (self).
+  
+  Private methods can only define instance methods, whereas Protected methods
+  can only define class methods.
+
+
+
