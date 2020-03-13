@@ -1,0 +1,53 @@
+#+TITLE: Minall Blog
+
+Here, I made a detailed explanation of every component of my blog, how variables
+act, and how methods work.
+
+* Introduction
+
+when entering the root of the page, we're routed into
+the index action of the ArticlesController, in routes.rb we have:
+
+#+BEGIN_SRC ruby
+root 'articles#index'
+#+END_SRC
+
+The given action is:
+
+#+BEGIN_SRC ruby
+  def index
+    if params[:category_id]
+      @articles = Category.find(params[:category_id]).articles
+    else
+      @articles = Article.all
+    end
+    @categories = Category.all
+
+  end
+#+END_SRC
+
+We see three variables, a light string, :category_id, and some class variables.
+
+If :category_id is existent, or true, @articles equal to all the /articles/ ids
+that are in the Category wanted by its id.
+
+Else, @articles contains all the articles ids given by the Article model,
+which gives all ids on the database.
+
+So, @articles will filter our articles by category, or show all of them.
+
+We then define a @categories variable, which contains all the categories given
+by the Category model. We'll latter use this variable.
+
+If we didn't had the if, entering the root page will give us error, since we're
+not giving any ID and thus, :category_id is inexistent, but if it is, we just
+display them all.
+
+With this we have a list of articles, clicking some of them will pass the index
+action a variable, saying we want to display only the articles in the category
+clicked.
+
+* Creating a New Article
+
+We have a button that allows us to add a new variable to the database, when
+clicked, we call the method new of the ArticlesController.
