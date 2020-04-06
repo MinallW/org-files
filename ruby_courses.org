@@ -1,0 +1,9 @@
+Learned at the Udemy Course
+
+#+BEGIN_SRC ruby :results output
+def caps(anarg)
+end
+
+caps( lambda{ x = "hello world".reverse ; puts ( x ) } )
+anarg.call
+#+END_SRC

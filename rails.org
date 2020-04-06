@@ -1,0 +1,51 @@
+#+TITLE: Rails
+
+Web-application framework that includes everything needed to create
+database-backed web applications according to the *Model-View-Controller*
+pattern.
+
+- Model Layer ::
+
+  Represents the domain model (such as Account, Product, Person, Post, etc.) and
+  encapsulates the business logic specific to your application. Database-backed
+  model classes are derived from /ActiveRecord::Base/.
+
+  Active Record allows us to present the data from database rows as objects and
+  embellish these data objects with business logic methods. Although most Rails
+  models are backed by a database, models can also be ordinary Ruby classess, or
+  implement a set of interfaces provided by the Active Model module.
+
+- Controller Layer ::
+
+  Responsible for handling incoming HTTP requests and providing a suitable
+  response. Usually means returning HTML, but Rails controllers can also
+  generate XML, JSON, PDFs, mobile-specific views, and more.
+
+  Controllers load and manipulate models, and render view templates in order to
+  generate the appropiate HTTP response. In Rails, incoming requests are routed
+  by Action Dispatch to an appropiate controller, and controller classes are
+  derived from /ActionController::Base/. Action Dispatch and Action Controller
+  are bundled together in *Action Pack*.
+
+- View Layer ::
+
+  Composed of "templates" responsible for providing appropiate representations
+  of your application's resources. Templates can come in a variety of formats,
+  but most view templates are HTML with embedded Ruby code.
+
+  Views are tipically rendered to generate the body of an email, View generation
+  is handled by *Action View*
+
+- Frameworks and Libraries ::
+
+    Active Redord, Active Model, Action Pack, and Action View can each be used
+    independently outside Rails. In addition of that, Rails also comes with
+    *Action Mailer*, a library to generate and send emails; *Action Mailbox*, a
+    library to receive emails within a Rails application; *Active Job*, a
+    framework for declaring jobs and making them run on a variety of queueing
+    backends; *Action Cable*, a framework to integrate WebSockets with a Rails
+    application; *Active Storage*, a library to attach cloud and local files to
+    Rails applications; *Action Text*, a library to handle rich text content; and
+    *Active Support, a collection of utility classes and standard library
+    extensions that are useful for Rails, and may also be used independently
+    outside Rails.

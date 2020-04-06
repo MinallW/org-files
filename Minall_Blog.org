@@ -1,7 +1,8 @@
 #+TITLE: Minall Blog
 
 Here, I made a detailed explanation of every component of my blog, how variables
-act, and how methods work.
+act, and how methods work. Also, it is important to install rvm through their
+official page, there's a command to install rvm and rails.
 
 * Introduction
 
@@ -27,17 +28,14 @@ The given action is:
 #+END_SRC
 
 We see three variables, a light string, :category_id, and some class variables.
-
 If :category_id is existent, or true, @articles equal to all the /articles/ ids
-that are in the Category wanted by its id.
 
-Else, @articles contains all the articles ids given by the Article model,
-which gives all ids on the database.
+that are in the Category wanted by its id. Else, @articles contains all the
+articles ids given by the Article model, which gives all ids on the database.
 
-So, @articles will filter our articles by category, or show all of them.
-
-We then define a @categories variable, which contains all the categories given
-by the Category model. We'll latter use this variable.
+So, @articles will filter our articles by category, or show all of them. We then
+define a @categories variable, which contains all the categories given by the
+Category model. We'll latter use this variable.
 
 If we didn't had the if, entering the root page will give us error, since we're
 not giving any ID and thus, :category_id is inexistent, but if it is, we just
@@ -47,7 +45,110 @@ With this we have a list of articles, clicking some of them will pass the index
 action a variable, saying we want to display only the articles in the category
 clicked.
 
+It's important to know how the MVC works here. We create an instance variable
+that will be new and inherit everything from the Model, while also giving the
+contents of that variable to the view.
+
 * Creating a New Article
 
-We have a button that allows us to add a new variable to the database, when
-clicked, we call the method new of the ArticlesController.
+To create articles, we have made a button that links us to the
+'new_article_path', in 'rail routes', this is simply redirecting us to the 'new'
+method of the ArticlesController.
+
+#+BEGIN_SRC ruby
+def new
+  @article = Article.new
+end
+#+END_SRC
+
+We say that the instance variable @article is equal to the creation of a new
+object, inherited fom the Article's model, if everything is configured
+correctly, we're creating a new instance in our database.
+
+The creation of instance variables is important, if the content they hold will
+be used latter in the view. Instance variables can be referred in the view and
+used on embedded ruby. Allowing us to make a single page that will show us
+different articles by its ID, or newly created ones.
+
+So, when entering the 'new_articles_path', we're defining this variable, but we
+also enter the associated view, *new.html.erb*, it's short btw.
+
+#+BEGIN_SRC html
+<h1>New Article</h1>
+
+<%= render 'form' %>
+#+END_SRC
+
+Here we are making user of partials, in the same folder as *new.html.erb*, we
+have *_form.html.erb*, containing the actual form used in the page:
+
+#+BEGIN_SRC html
+
+<%= form_with model: @article, local: true do |form| %>
+
+    <% if @article.errors.any? %>
+        <div id="error_explanation">
+            <h2>
+                <%= pluralize(@article.errors.count, "error") %> No permitió que
+                se guarde este artículo
+            </h2>
+            <ul>
+                <% @article.errors.full_messages.each do |msg| %>
+                    <li><%= msg %></li>
+                <% end %>
+            </ul>
+        </div>
+    <% end %>
+
+    <p>
+        <%= form.label :Título %><br>
+        <%= form.text_field :title %>
+    </p>
+
+    <p>
+        <%= form.label :Contenido %><br>
+        <%= form.text_area :text %>
+    </p>
+
+    <p>
+        <%= form.submit %>
+    </p>
+
+<% end %>
+
+#+END_SRC
+
+It's a little larger, but, we specify in *form_with model: @article* at the
+beginning, that we're making a form that will use the @article instance
+variable, passed by the controller with all the information of our article
+wanted.
+
+Here, we say that if @article raises an error in the controller, we should print
+them in ul. Maybe because the article is too short, or because it's nil. We can
+define this rules in our model. In *Article* we have:
+
+#+BEGIN_SRC ruby
+class Article < ApplicationRecord
+  validates :title, presence: true, length: { minimun: 5 }
+  has_many :comments, dependent: :destroy
+  belongs_to :category
+end
+#+END_SRC
+
+*validated*, checks the presence of :title and its length. *has_many* is a
+relationship with comments in the database and *belong_to* is also a
+relationship. We'll latter explain these two.
+
+The important part now is the *validated*
+
+So, if there's any error with the creation of the @article given these rules,
+show these errors.
+
+#+BEGIN_SRC html
+<%= pluralize (@article.errors.count, "error") %>
+#+END_SRC
+
+This line calls @article.errors.count, which contains an integer depending on
+the number of errors, and pass it to pluralize which says: if there's more than
+one error, turn "error" into "errors".
+

@@ -1,0 +1,18 @@
+#+TITLE: C Programming
+
+In order for a better understanding of programming in general, I'll scan some C
+code, partly from OpenBSD repositories due to its code correctness and security
+in mind.
+
+* cat
+
+The code for this command in OpenBSD can be found at: [[lat: https://github.com/openbsd/src/blob/master/bin/cat/cat.c][This link]]
+
+Starting from what it includes, we have:
+
+#+BEGIN_SRC cpp
+#include <sys/types.h>
+#+END_SRC
+
+Includes in it data types, in this file only the *blksize_t* type is used, used
+for block sizes.
