@@ -1,0 +1,709 @@
+All this org file are recopilation of important parts from 'The Linux
+System Administrator's Guide Version 0.7, Lars Wirzenius.
+
+* Varios parts of an OS
+
+  A UNIX operating system consists of a /kernel/ and some /system
+  programs/. There are also some /application programs/ for doing
+  work. The kernel is the heart of the operating system. It keeps track
+  of files on the disk, starts programs and runs them concurrently,
+  assigns memory and other resources to various processes, receives
+  packets from and sends packets to the network, and so on.
+
+  The kernel does very little by itself, but it provides tools with
+  which all services can be built. It also prevents anyone from
+  accessing the hardware directly, forcing everyone to use the tools it
+  provides. This way the kernel provides some protection for users from
+  each other. The tools provided by the kernel are used via /system/
+  /calls/.
+
+  The system programs use the tools provided by the kernel to implement
+  the various services required from an operating system. SYstem
+  programs, and all other program, run "on top of the kernel", in what
+  is called the /user mode/. The difference between system and
+  application programs is one of intent: applications are intended for
+  getting useful things done, whereas system programs are needed to get
+  the system working. A word processor is an application; *mount* is a
+  system program. 
+
+  An OS can also contain compilers and their corresponding libraries
+  (GCC and the C library in particular under Linux), although not all
+  programming languages need be part of the operating
+  system. Documentation, and sometimes even games, can also be part of
+  it. Traditionally, the OS has been defined by the contents of the
+  installation tape or disks; Wwith Linux it is not clear since it's
+  spead all over the FTP sites of the world.
+
+* Importants parts of the kernel
+
+  The Linux kernel consist of several important parts: process
+  management, memory management, hardware device drivers, filesystem
+  drivers, network management, and various other bits and pieces.
+
+  Probably the most important parts of the kernel are memory
+  management and process management. Memory management takes care of
+  assigning memory areas and swap space areas to processes, parts of
+  the kernel, and for the buffer cache. Process management creates
+  procesess, and implements multitasking by switching the active
+  process on the processor.
+
+  At the lowest level, the kernel contains a hardware device driver
+  for each kind of hardware it supports. Since the world is full of
+  different kinds of hardware, the number of hardware device drivers
+  is large. There are often many otherwise similar pieces of hardware
+  that differ in how they are controlled by software. The similarities
+  make it possible to have general classes of drivers that support
+  similar operations; each member of the class has the same interface
+  to the rest of the kernel but differs in what it needs to do to
+  implement them. For example, all disk drivers look alike to the rest
+  of the kernel, i.e., they all have operations like 'initialize the
+  drive', 'read sector N', and 'write sector N'.
+
+  Some software services provifded by the kernel itself have similar
+  properties, and can therefore be abstracted into classes. For
+  example, the various network protocols have been abstracted into one
+  programming interface, the BSD socket library. Another example is
+  the /virtual filesystem/ (VFS) layer that abstracts the filesystem
+  operations away from their implementation. Each filesystem type
+  provides an implementation of each filesystem operation. When some
+  entity ftries to use a filesystem, the request goest via the VFS,
+  which routes the request to the proper filesystem driver.
+
+* Major services in a UNIX system
+
+** init
+
+   The single most important service in a UNIX system is provided by
+   *init*, it's started as the first process of every UNIX system, as
+   the last thing the kernel does when it boots. When *init* starts,
+   it continus the boot process by doing various startup chores
+   (checking and mounting filesystems, starting daemons, etc).
+
+   The exact list of things that *init* does, depends on which flavour
+   it is; there are several to choose from. *init* usually provides
+   the concept of /single user mode/, in which no one can log in and
+   root uses a shell at the console; the usual mode is called
+   /multiuser mode/. Some flavours generalise this as /run levels/,
+   single and multiuser modes are considered to be two run levels, and
+   there can be additional ones as well, for example, to run X on the
+   console.
+
+   Linux allows for up to 10 /runlevels/, 0-9, but usually only someo
+   f these are defined by default. Runlevel 0 is defined as 'system
+   halt'. Runlevel 1 is defined as 'single user mode'. Runlevel 6 is
+   defined as 'system reboot'. Other runlevels are dependent on how
+   your particular distribution has defined them, and they vary
+   significantly between distributions. Looking at the contents of
+   /etc/inittab usually will give some hint what the predefined
+   runlevels are and what they have been defined as.
+   
+   In normal operation, *init* makes sure *getty* is working (to allow
+   users to log in), and to adopt orphan processes (processes whose
+   parent has died; in UNIX /all/ processes /must/ be in a single
+   tree, so orphans must be adopted).
+
+   When the system is shut down, it is *init* that is in charge of
+   killing all other processes, unmounting all filesystems and
+   stopping the processor, along with anything else it has been
+   configured to do.
+
+** Logins from terminals
+   
+   Logins from terminals (via serial lines) and the console (when not
+   running X) are provided by the *getty* program, *init* starts a
+   separate instance of *getty* for each terminal uponn which logins
+   are to be allowed. *getty* reads the username and runs the *login*
+   program, which read the password. If the username and paswrod are
+   correct, *login* runs the shell. When the shell termines kk, i.e.,
+   the user logs out, or when *login* terminated because the username
+   and password didn't match, *init* notices this and starts a new
+   instance of *getty*. The kernel has no notion of logins, this is
+   all handled by the *system programs*.
+
+** Syslog
+
+   The kernel and many /system programs/ produce error, warning, and
+   other messages. it is often important that these messages can be
+   viewed later, even much later, so they should be written to a
+   file. The program doing this is *syslog*. It can be configured to
+   sort the messages to different files according to writer or degree
+   of importance. For example, kernel messages are often directed to a
+   separate file from the others, since kernel messages are often more
+   important and need to be reead regularly to spot problems.
+
+** Periodic command execution: cron and at
+
+   both users and system administrators often need to run command
+   periodically. For example, the system administrator might want to
+   run a command to clean the directories with temporary files (/tmp
+   and /var/tmp) from older files, to keep the disks from filling up,
+   since not all programs clean up after themselves correctly.
+
+   The *cron* service is set up to do this. Each user can have a
+   /contrab/ file, where she lists the commands she wishes to execute
+   and the times they should be executed. The *cron* daemon takes care
+   of starting the commands when specified.
+
+   The *at* service is similar to *cron*, but it is once only: the
+   command is executed at the given time, but it is not repeated.
+
+   See the manual pages cron(1), crontab(1), contrab(5), at(1) and
+   atd(8) fromfor more in depth information.
+
+   Unix and Linux don't incorporate the user interface into the
+   kernel; instead, they let it be implemented by user level
+   programs. This applies for both text mode and graphical
+   environments.
+
+   This arrangement makes the system more flexible, but has the
+   disadvantage that it is simple to implement user interface for each
+   program, making the system harder to learn.
+
+   The graphical environment primarily used with Linux is called the X
+   Window System. X alsos does not implement user interface; it only
+   implements a window system, i.e, tools with which a graphical user
+   interface can be implemented. 
+
+** Networking
+
+   Networking is the act of connecting two or more computers so that
+   they can communicate with each other. The actual methods of
+   connecting and communicating are slightly complicated, but the end
+   result is very useful.
+
+   UNIX operating systems have many networking features. Most basic
+   services (filesystems, printing, backups, etc.) can be done over
+   the network. This can make system administration easier, since it
+   allows centralised administration, while still reaping in the
+   benefits of microcomputing and distributed computing, such as lower
+   costs and better fault tolerance.
+   
+   For more information: http://www.linuxdoc.org/LDP/nag2/index.html
+
+** Network logins
+
+   These work a differently than normal logins. There is a separate
+   physical serial line for each terminal via which it is possible to
+   log in. For each person logging in via the network, there is a
+   separate virtual network connection, and there can be any number of
+   these. It is therefore not possible to run a separate *getty* for
+   each possible virtual connection. There are also several different
+   ways to log in via a network, *telnet* and *rlogin* being the major
+   ones in TCP/IP networks.
+
+   Network logins have, insteadof a herd of *getty*s, a single daemon
+   per way of logging (*telnet* and *rllogin* have separate daemons)
+   that listens for all incoming login attempts. When it notices one,
+   it starts a new instance of itself to handle that single attempt;
+   The original instance continues to listen for other attemps.
+
+** Network file systems
+
+   ONe of the most useful things that can be done with networking
+   services is sharing via a /network file system/. The one usually
+   used is called the Network File System, or NFS.
+
+   With a network file system any file operations done by a program on
+   one machine are sent over the network to another computer. This
+   fools the program to think that all the files on the other computer
+   are actually on the computer the program is running on. This makes
+   information sharing extremely simple, since it requires no
+   modifications to programs.
+
+** Mail
+
+   Electronic mail is the most popularly used method for communicating
+   via computer. AN electronic letter is stored in a file using a
+   special format, and special mail programs are used to send and read
+   letters.
+
+   Each user has an /incoming mailbox/ (a file in the special format),
+   where all new mail is stored. When someone sends mail, the mail
+   program locates the receiver's mailbox and appends the letter to
+   the mailbox file. If the receiver's mailbox is in another machine,
+   the letter is sent to the other machine, which delivers it to the
+   mailbox as it best sees fit.
+
+   The mail system consists of many programs. The delivery of mail to
+   locate or remote mailboxes is done by one program (the /mail
+   transfer agent/(MTA), e.g., *sendmail* or *smail*), while the
+   programs users use are many and varied (/mail user agnet (MUA),
+   e.g., *pine*, *mutt* or *elm*). The mailboxes are usually stored in /var/spool/mail
+
+** The filesystem layout
+
+   THe filesystem is divided into many parts; usually along the lines
+   of a root filesystem with /bin, /lib, /etc, /dev, and a few others;
+   a /usr filesystem with programs and unchanging data; a /var
+   filesystem with changing data (such as log files); and a /home
+   filesystem for everyone's personal files. Depending on the hardware
+   configuration and the decisions of the system administrator, the
+   division can be different; it can even be all in one filesystem.
+
+** Overview of the directory tree, Background
+
+   This chapter describes the important parts of a standard Linux
+   directory tree, based on the Filesystem Hierarchy Standard. It
+   outlines the normal way of breaking the directory tree into
+   separate filesystems with different purposes and gives the
+   motivation behind this particular split. 
+
+   We'll study the /Filesystems Hierarchy Standard/ (FHS), which
+   attempts to set a standard for how the directory tree in a Linux
+   system is organised. Such a standard has the advantage that it will
+   be easier to write or port software for Linux, and to administer
+   Linux machines, since everything should be in a standardised
+   places. 
+
+   The full directory tree is intented to be breakable into smaller
+   parts, each capable of being on its own disk or partition, to
+   accommodate to disk size limits and to ease backup and other system
+   administration tasks. The major parts are the root (/), /us, /var,
+   and /home filesystems. Each part has a different purpose. The
+   directory tree has been designed so that it works well in a network
+   of Linux machines which may share some parts of the filesystems
+   over a read-only device, or over the network with NFS.
+
+   - / :: It's specific for each machine (generally stored on a
+          local disk, although it could be a ramdisk or network
+          drive as well) and contains the files that are necessry
+          for booting the system up, and to bring it up to such a
+          state that the other filesystems may be mounted. The
+          contents of the root filesystem will therefore be
+          sufficient for the single user state. It will also
+          contain tools for fixing a broken system, and for
+          recovering lost files from backups.
+
+   - /usr :: contains all commands, libraries, manual pages, and other
+             unchanging files needed during normal operations. no
+             files in /usr shiuld be specific for any given machine,
+             nor should they be modified during normal use. This
+             allows the files to be shared over the network, which can
+             be cost-effective since it saves disk space. It can make
+             administration easier (only the master /usr need to be
+             changed when updating an application, not each machine
+             separately) to have /usr network mounted. Even if the
+             filesystem is on a local disk, it could be mounted
+             read-only, to lessen the chance of filesystem corruption
+             during a crash.
+
+   - /var :: Contains files that change, such as spool directories
+             (for mail, news, printes, etc), og files, formatted
+             manual pages, and temporary files. Traditionally
+             everything in /var has been somewhere below /usr. But
+             that made it impossible to mount /usr read-only.
+
+   Although the different parts have been called filesystems above,
+   there is no requirement that they actually be on separate
+   filesystems. They could easily be kept in a single one of the
+   system is a small single-user system and the user wants to keep
+   things simple. The directory tree might also be divided into
+   filesystems differently, depending on how large the disks are, and
+   how space is allocated for various purposes. The same partition,
+   the name /usr/lib/libc.a and /var/log/messages must work, for
+   example by moving files below /var into /usr/var, and making /var a
+   symlink to /usr/var.
+
+   The Unix filesystem structure groups files according to purpose,
+   ie.e., all commands are in one place, all data files in another,
+   documentation in a third, and so on.
+
+** The root filesystem (/)
+
+   The root filesystem should generally be small, since it contains
+   very critical files and a small, infrequently modified sfilesystem
+   has a better change of not getting corrupted. A corrupted root
+   filesystem will generally mean that the system becomes unbootable
+   except with special measures.
+
+   Generally, it doesn't contain any files, except perhaps the
+   standard boot image for the system, usually called /vmlinuz. All
+   other files are in subdirectories in the root filesystems:
+
+   - /bin :: Commands needed during bootup that might be used by
+             normal users (probably after bootup).
+
+   - /sbin :: Like /bin, but the commands are not intended for normal
+              users, although they may use them if necessary and allowed.
+
+   - /etc :: Configuration files specific to the machine.
+
+   - /root :: Root's home directory
+
+   - /lib :: Shared libraries needed by the programs on the root filesystem
+
+   - /lib/modules :: Loadable kernel modules, especially those that
+                     are needed to boot the system when recovering
+                     from disasters (e.g., network and filesystem drivers).
+
+   - /dev :: Device files.
+
+   - /tmp :: Temporary files. Programs running after bootup should use
+             /var/tmp, not /tmp, since the former is probably on a
+             disk with more space. Often /tmp will be a symbolic link
+             to /var/tmp
+
+   - /boot :: Files used by the botostrap loader, e.g., *LILO*. Kernel
+              images are often kept here instead of in the root
+              directory. If there are many kernel images, the
+              directory can easily grow rather big, and it might be
+              better to keep it in a separate filesystem. Another
+              reason would be to make sure the kernel iamges are
+              within the first 1024 cylinders of an IDE disk.
+
+   - /mnt :: Mount point for temporary mounts by the sysadmin.
+
+   - /proc, /usr, /var, /home :: 
+
+** The /etc directory
+
+   It contains configuration files.
+
+   - /etc/rc or /etc/rc.d or /etc/rc?.d :: Scripts or directories of
+        scripts to run at startup or when changing the run level.
+
+   - /etc/passwd :: The user database, with fields giving the
+                    username, real name, home directory, encrypted
+                    password, and other information about each
+                    user. The format is documented in the *passwd* man
+                    page. The encrpyted passwords are much more
+                    commonly found in the /etc/shadow.
+
+   - /etc/fstab :: Lists the filesystems mounted automatically at
+                   startup by the *mount -a* command (in /etc/rc or
+                   equivalent startup file). Under Linux, also
+                   contains information about swap areas used
+                   automatically by swapon -a.
+
+   - /etc/group :: Similar to /etc/passwd, but describes groups
+                   instead of users.
+
+   - /etc/inittab :: Configuration file for *init*.
+
+   - /etc/issue :: Output by *getty* before the login prompt. Usually
+                   contains a showrt description or welcoming message
+                   to the system.
+
+   - /etc/magic :: The configuration file for *file*. Contains the
+                   descriptions of various file formats based on which
+                   *file* guesses the type of the file.
+
+   - /etc/motd :: Message of the day
+
+   - /etc/mtab :: List of currently mounted filesystems. Initially set up
+		  by the bootup scripts, and updated automatically bu the mount
+		  command. Used when a list of mounted filesystems is
+                  needed, e.g., by the *df* command.
+
+   - /etc/shadow :: Shadow password file on systems with shadow
+                    password software installed. Shadow passwords move
+                    the encrypted password from /etc/passwd into
+                    /etc/shadow; The latter is not readable by anyone
+                    except root. This makes it harder to crack
+                    passwords.
+
+   - /etc/login.defs :: cOnfiguration file for the *login* command.
+
+   - /etc/printcap :: Like /etc/termcap, but for printers.
+
+   - /etc/profile, /tc/csh.login, /etc/csh.cshrc :: File executed at
+        login or startup time by the Bourne or C shells. These allow
+        the sysadmin to set global defaults for all users.
+
+   - /etc/securetty :: Identifies secure terminals, i.e., the terminal
+                       from which root is allowed to log in. Typically
+                       only the virtual consoles are listed, so that
+                       it becomes impossible (or at least harder) to
+                       gain superuser privileges by breaking into a
+                       system over a modem or a network. Do not allow
+                       root logins over a network. Prefer to log in as
+                       an unprivileged user and use *su* or *sudo* to
+                       gian root privileges.
+
+   - /etc/shells :: Lists trusted shells. The *chsh* command allows
+                    users to change their login shell only to shells
+                    listed in this file. *ftpd*, the server process
+                    that provices FTP services for a machine, will
+                    check that the user's shell is listed in
+                    /etc/shells and will not let people log in unless
+                    the shell is listed there.
+
+   - /etc/termcap :: The terminal capability database. Describes by
+                     what 'escape sequences' various terminals can be
+                     controller. Programs are written so that instead
+                     of directly ouputting an espace sequence that
+                     only works on a particular brand of terminal,
+                     they look up the correct sequence to do whatever
+                     it is they want to do in /etc/termcap. As a
+                     result most programs work with most kinds of
+                     terminals.
+
+** The /dev directory
+
+   Contains special device files for all dvices. The device files are
+   named using special conventions. The device files are created
+   during installation, and later with the /dev/MAKEDEV script. This
+   script written by the sysadmin created local-only devices files or links.
+
+** The /usr filesystem
+
+   It's often large, since all programs are installed there. All files
+   in /usr usually come from a Linux distribution; locally installed
+   progrmas and other stuff goes below /usr/local. This makes it
+   possible to update te system from a new version of the
+   distribution, or even a completely new distribution, without having
+   to install all programs again. 
+
+   - /usr/X11R6 :: X.org files.
+
+   - /usr/bin :: Almost all user commands. Some commands are in /in or
+                 in /usr/local/bin
+
+   - /usr/share/{man, info, doc} :: Manuel pages, GNU Info documents,
+        and miscellaneous other documentation files.
+
+   - /usr/include :: Header files for the C programming language. This
+                     should actually be below /usr/lib for
+                     consistency, but the tradition is overwhelmingly
+                     in support for this name.
+
+   - /usr/lib :: Unchanching data files for programs and subsystems,
+                 including some site-wide configuration files. The
+                 name /lib/ comes from library; originally libraries
+                 of programming subroutines were stores in /usr/lib
+
+   - /usr/local :: The place for locally installed software and other
+                   files. Distributions may not install anything in
+                   here. It is reserved solely for the use of the
+                   local administrator. THis way he can be absolutely
+                   ceratin that no updates of upgrades to his
+                   distribution will overwrite any extra software he
+                   has installed locally.
+
+** The /var filesystem
+
+   Contains data that is changed when the system is running
+   normally. It is specific for each system, i.e., not shared over the
+   network with other computers.
+
+   - /var/games :: Any variable data belonging to games in /usr should
+                   be placed here. This is in case /usr is mounted
+                   read only.
+
+   - /var/lib :: Files that change while the system is running normally
+
+   - /var/local :: Variable data for programs that are installed in
+                   /usr/local (i.e., programs that have been installed
+                   by the system administrator). NOte that even
+                   locally installed programs should usse the other
+                   /var directories if they are appropiate, e.g., /var/lock
+
+   - /var/lock :: Lock files. Many programs follow a convention to
+                  create a ock file in /var/lock to indicate that they
+                  are using a particular device or file. Other
+                  programs will notice the lock file and won't attempt
+                  to use the device or file.
+
+   - /var/log :: Log gfiles from various programs, especially *login*
+                 and *syslog*. Files in /var/log can often grow
+                 indefinitely, and may require cleaning at regular intervals.
+
+   - /var/mail :: Approved location for user mailbox files.
+
+   - /var/run :: Files that contain information about the system that
+                 is valid until the system is next booted. For
+                 example, /var/run/utmp contains information about
+                 people currently logged in.
+
+   - /var/spool :: Directores for news, printer queues, and other
+                   queued work.
+
+   - /var/tmp :: Temporary files that are large or that need to exist
+                 for a longed time thatthan what is allowed for /tmp.
+
+** The /proc filesystem
+
+   Contains a illusionary filesystem. It does not exist on a
+   disk. Instead, the kernel created it in memory. It is used to
+   provide information about the system (originally about processes,
+   hence the name). 
+
+   - /proc/1 :: A directory with information about process
+                number 1. Each process has a directory below /proc
+                with the name being its process identification number.
+
+   - /proc/cpuinfo :: Information about the processor, such as its
+                      type, make, model, and performance
+
+   - /proc/devices :: List of device drivers configured into the
+                      currently runninng kernel.
+
+   - /proc/filesystems :: Filesystems configured into the kernel.
+
+   - /proc/interrupts :: Shows which interrupts are in use, and how
+        many of each there have been.
+
+   - /proc/ioports :: which I/O ports are in use at the moment.
+
+   - /proc/kcore :: An image of the physical memory of the
+                    system. THis is exactly the same size as your
+                    physical memory, but does not really take up that
+                    much memory;it is generated on the fly as programs
+                    access it (Remember: unless you copy it elsewhere,
+                    nothing under /proc takes up any disk space at all.)
+
+   - /proc/kmsg :: Messages output by the kernel. These are also
+                   routed to *syslog*.
+
+   - /proc/ksysms :: Symbol table for the kernel
+
+   - /proc/loadavg :: The 'load average' of the system; three
+                      meaningless indicators of how much work the
+                      system has to do at the moment.
+
+   - /proc/meminfo :: Information about memory usage, both physical
+                      and swap.
+
+   - /proc/modules :: Which kernel modules are loaded at the moment.
+
+   - /proc/net :: Status information about network protocols.
+
+   - /proc/self :: A symbolic link to the process directory of the
+                   program that is looking at /proc. When two
+                   processes look at /proc, they get different
+                   links. This is mainly a convenience to make it
+                   easier for programs to get at their process directory.
+
+   - /proc/stat :: Various statistics about the system, such as the
+                   number of page faults since the system was booted.
+
+   - /proc/uptime :: The time the system has been up
+
+   - /proc/version :: The kernel version
+		      
+   Noe that while the above files tend to be easily readable text
+   files, they can sometimes be formatted in a way that is not easily
+   digestible. There are manny commnands that do little more than read
+   the above files and format them for easier understanding. For
+   example, the *free* program reads /proc/meminfo and converts the
+   amounts given in bytes to kilobytes (and adds a little more
+   information, as well).
+
+
+** Device Files The MAKEDEV Script
+   
+   Most devices files will already be created and will be there ready
+   to use after you install your Linux system. If by some change you
+   need to create one which is not provided then you should first try
+   to use the *MAKEDEV* script. This script is usually located in
+   /dev/MAKEDEV but might also have a copy (or a symbolic link) in
+   /sbin/MAKEDEB. 
+
+   In general, the command is used as:
+
+   #+BEGIN_SRC bash
+
+   /dev/MAKEDEV -v ttyS0
+   > create ttyS0   c  4  64  root:dialout  0660
+   
+   #+END_SRC
+
+   This will create the device file /dev/ttyS0 with major node 4 and
+   minor mode 64 as a character device with access permissions 0660
+   with owner root and group dialout
+
+   ttyS0 is a serial port. The major and minor node numbers are
+   numbers understood by the kernel. The kernel refers to hardware
+   devices as numbers, this would be very difficult for us to
+   remember, so we use filenames. Access permissions of 0660 means
+   read and write permission for the owner, and read and write
+   permission for the group, with no access for anyone else.
+
+   We can also use the mknod command to create device files.
+
+** Using Disks and Other Storage Media
+
+   The basic tasks in administering disks are:
+   
+   - Format your disk :: This does various things to prepare it for
+        use, such as checking for bad sectors.
+
+   - Partition a hard disk :: Partition allow us to simplify
+        administrator's tasks, by separating user files to system
+        files, so they don't interfere with each other.
+
+** Two inds of devices
+
+   UNIX, and therefore Linux, recognises two different kinds of
+   device: random-access block devices (such as disks), and character
+   devices (such as tapes and serial lines), some of which may be
+   serial, and some random-access. Each supported device is
+   represented in the filesystem as a /device file/. Then you read or
+   write a device file, the data come from or goes to the device it
+   represents. This way no special programs (and no special
+   application programming methodology, such as catching interrupts or
+   polling a serial port) are neccesary to access devices; for
+   example, to send a file tothe printer, one could just say
+
+   #+BEGIN_SRC bash
+   cat filename > /dev/lp1   
+   #+END_SRC
+   
+   and the contents of the file are printed (the file must, of course,
+   be in a form that the printer understands). However, since it is
+   not a good idea to have several people cat their files to the
+   printer at the same time, one usually usese a special program to
+   send the files to be printed (*lpr*). Something similar is needed
+   for most devices. In fact, one seldom needs to worry about device
+   files at all.
+
+   Since device show up as files in the filesystem (in the /dev
+   directory), it is easy to see jsut what device files exist, usin ls
+   or another suitable command. In the output os *ls -l*, the first
+   column contains the type of the file and its permissions. The first
+   character being a 'c' tells us that it's a character device, for
+   ordinary files, the first character is '-', for directories, it is
+   'd', and for block devices 'b'.
+
+   Note that usually all devices files exist even though the device
+   itself might not be installed. So just because you have a file
+   /dev/sda, it doesn't mean that you really do have an SCSI hard
+   disk. Having all the device files makes the installation for
+   programs simpler, and makes it easier to add new hardware (there is
+   no need to find out the correct parameters for and create the
+   device files for the new device.)
+
+** Hard disks
+
+   The CPU and the actual disks communicate throught a /disk
+   contrller/. This relieves the rest of the computer from knowing how
+   to use the drive, since the controllers for different types of
+   disks can be made to use the same interface towards the res of the
+   computer. Therefore, the computer can say just 'give me what I
+   need' along with a complex series of electric signals to move the
+   head to the proper location and waiting for the correct position to
+   come under the head and doing all the other unpleasant stuff necessary.
+
+** Filesystems
+
+   A /filesystem/ is the methods and ata structures that an operating
+   system uses to keep track of files on a disk or partition; that is,
+   the way the files are organised on the disk
+
+** Virtual memory
+
+   Linux supports /virtual memory/, that is, using a disk as an
+   extension of RAM so that the effective size of usable memory grows
+   correspondingly. The kernel will write the contents of a currently
+   unused block of memory to the hard disk so that the memory can be
+   usd for another purpose. When the original contents are needed
+   agiain, they are read back into memory. This is all made completely
+   transparent to the user; programs running under LInux only see the
+   largest amount of memory available and don't notice that parts of
+   them reside on the disk from time to time. 
+
+   Of course, reading and writing the hard disk is slower than using
+   real RAM, so the programs don't urun as fast. The part of the hard
+   disk that is used as virtual memory is called the /swap space./
+
+   

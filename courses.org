@@ -1,4 +1,5 @@
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
+:PROPERTIES:
+
 Some courses from different sources, or a recopilation of important
 information.
 
@@ -3715,7 +3716,7 @@ information.
   
     To add HTTPS to a Server, thus the Web Page, use certbot
 
-* Cibersecurity
+* Cybersecurity
 ** Mail Security
   
    Use GPG for good email security
@@ -7478,84 +7479,6 @@ information.
     WE can filter http.request.method=="POST" filters how many packages
     of http with a method post (used for formularies).
 
-*** Nmap
-
-    Allows us to scan ports and information of a given target by its IP.
-
-    'nmap --script dns-brute google.com' allows us to identify the
-    servers the target is using
-   
-    nmap --script=firewalk --traceroute
-    --script-args=firewalk.max-retries=1 domain.com
-
-    nmap --script http-sitemap-generator domain.com -p 80
-
-    nmap -sS -vv -d -sC -sV -O
-
-    'nmap -p445 --script smb-vuln-ms17-010 192.168.1.0/24' checks a
-    windows PC and looks for vulnerabilities
-
-    nmap -sT 216.92.116.13
-
-    ftp
-
-    netcat
-
-    netstat -a
-
-    netstat -aon
-
-    For information about your system and ports.
-
-    nmap -sS -O 127.0.0.1, the -sS is to do a SYN or so-called stealth scan, and
-    -O for 'guess operating system'.
-
-    In Nmap, all ports that are marked as 'filtered' means that they're protected
-    by a firewall. They're well-known and vulnerable, so they should always be
-    blocked. 
-
-    Syn Scan
-
-    The information that we will need is:
-   
-    - Firewall brand, model, firmware version, and software patches that exists
-
-    - Remote connections authentication, access privileges, and processes.
-
-    - Other servers that connect to the network, this includes Email HTML,
-      back-up, redundant, off-site, hired or out-sourced services, and even
-      contractors that may have used your network or are using it now.
-
-    - Printers, fac machines, photocopiers, wireless routers, and network
-      connections in your company waiting room.
-
-    nmap --script dns-brute domain.com, this allows us to identify
-    the servers of the target
-
-    nmap --script=firewalk --traceroute
-    --script-args=firewalk.max-retries=1 domain.com
-
-    nmap --script http-sitemap-generator domain.com -p 80
-
-    portalhacker.net
-    Lbrary
-
-    nmap -sS -vv -d -sC -sV -O
-
-    nmap -sTV -Pn -n --top-ports 10 --reason -oA hhs_5_06 hackerhighschool.org
-
-    In Nmap, all ports that are marked as 'filtered' means that they're protected
-    by a firewall. They're well-known and vulnerable, so they should always be
-    blocked. 
-
-    SYN Scan
-    Another famous scanning technique is the SYN scan. When nmap is doing this type
-    of scan, nmap sends only a SYN packet without completing the three-way
-    handshake***. This is also called a "half-open" or "stealth" scan, because
-    there TCP connections are not completed. (Be very clear that while a target
-    may not log a connection, you are still making digital "noise" that can be
-    detected.)
-
 *** Github Effective engineer notes
 
     Focus on High Leverage Activities:
@@ -7993,12 +7916,6 @@ information.
 *** Armitage
 
     A cyber attack management for metasploit.
-
-*** Metasploit
-
-    A scriptable red team collaboration tool for Metasploit that
-    visualizes targets, recommends exploits, and exposes the advanced
-    post-exploitation features in the framework
 
 *** MITMF
 
@@ -8476,7 +8393,6 @@ information.
      or making a retrieve of any password or data.
 
     
-    
 *** GRSecurity
 
     GRecurity is a set of patches for the linux kernel with and
@@ -8511,7 +8427,6 @@ information.
      these rolees and restrictions form a "policy" which can be amended
      as needed.
 
-    
 * Working with Window Managers
 
 
@@ -8840,5 +8755,161 @@ For checking devices FLOSS'ness, we can use h-node
     veamos algunos:
    
 
+* CRYPTOHACK
+
+  Compilation of information in the CRYPTOHACK site. We use python
+  here.
+
+  Here's a python script example, that sends JSON to a host and specific
+  port.
+
+  We first start importing and setting variables
+
+  #+NAME: sendJson
+  #+BEGIN_SRC python :noweb yes :tangle sendJson.py
+  #!/usr/bin/env python3
+  import telnetlib
+  import json  
+  
+  HOST = "socket.cryptohack.org"
+  PORT = 11112
+  #+END_SRC
+  
+  We set this file to be executed by python3, and import /telnetlib/
+  library in the official documentation:
+
+  'provides a Telnet class that implements the Telnet protocol. In
+  addition, it provides symbolic constants for the protocol
+  characters.
+  
+  The /Telnet/ class represents a connection to a Telnet server.'
+
+  In the Telnet Protocol Specification:
+
+  'The purpose of the TELNET protocol is to provide a fairly general,
+  bi-directional, eight-bit byte oriented communications
+  facility. Its primary goal is to allow a standard method of
+  interfacing terminal devices and terminal-oriented processes to each
+  other. It is envisioned that the protocol may also be used for
+  terminal-terminal communication ("linking") and process-process
+  communications (distributed computation).'
+  		 
+  From here, we know that as apache, TELNET is a protocol to open a
+  server, but for different usages than showing we pages.
+  
+  From /MakeUseOf Explains/:
+
+  '
+  - Bidirectional: Means Telnet is not one-way; it can be used to send
+  and receive information.
+
+  - Interactive: It expects a live user on one end of the line. It's
+    built to be human-readable.
+
+  - Text-oriented: It is a text-only protocol
+  '
+
+  'The /one/ thing you should know about Telnet is that, it is *not* a
+  secure protocol. When you log into a remote host using Telnet, your
+  username and password are sent "in the clear" - meaning, in plain
+  text and not encrypted in any way.'
+
+  We also import the JSON module to be able to generate and use and
+  control JSON data using python code.
+
+  
+
+  		 		 
+    
+* Hacking Guides
+
+** Learn Nmap
+
+   Allows us to scan ports and information of a given target by its IP.
+
+   The '-A' option means aggressive. '-o' stands for OS '-sC' runs
+   several scripts inside of nmap once.
+
+   'nmap --script dns-brute google.com' allows us to identify the
+   servers the target is using
    
+   nmap --script=firewalk --traceroute
+   --script-args=firewalk.max-retries=1 domain.com
+
+   nmap --script http-sitemap-generator domain.com -p 80
+
+   nmap -sS -vv -d -sC -sV -O
+
+   'nmap -p445 --script smb-vuln-ms17-010 192.168.1.0/24' checks a
+   windows PC and looks for vulnerabilities
+
+   nmap -sT 216.92.116.13
+
+   ftp
+
+   netcat
+
+   netstat -a
+
+   netstat -aon
+
+   For information about your system and ports.
+
+   nmap -sS -O 127.0.0.1, the -sS is to do a SYN or so-called stealth scan, and
+   -O for 'guess operating system'.
+
+   In Nmap, all ports that are marked as 'filtered' means that they're protected
+   by a firewall. They're well-known and vulnerable, so they should always be
+   blocked. 
+
+   Syn Scan
+
+   The information that we will need is:
+   
+	- Firewall brand, model, firmware version, and software patches that exists
+
+	- Remote connections authentication, access privileges, and processes.
+
+	- Other servers that connect to the network, this includes Email HTML,
+	  back-up, redundant, off-site, hired or out-sourced services, and even
+	  contractors that may have used your network or are using it now.
+
+	- Printers, fac machines, photocopiers, wireless routers, and network
+	  connections in your company waiting room.
+
+	  nmap --script dns-brute domain.com, this allows us to identify
+	  the servers of the target
+
+	  nmap --script=firewalk --traceroute
+	  --script-args=firewalk.max-retries=1 domain.com
+
+	  nmap --script http-sitemap-generator domain.com -p 80
+
+	  portalhacker.net
+	  Lbrary
+
+	  nmap -sS -vv -d -sC -sV -O
+
+	  nmap -sTV -Pn -n --top-ports 10 --reason -oA hhs_5_06 hackerhighschool.org
+
+	  In Nmap, all ports that are marked as 'filtered' means that they're protected
+	  by a firewall. They're well-known and vulnerable, so they should always be
+	  blocked. 
+
+	  SYN Scan
+	  Another famous scanning technique is the SYN scan. When nmap is doing this type
+	  of scan, nmap sends only a SYN packet without completing the three-way
+	  handshake***. This is also called a "half-open" or "stealth" scan, because
+	  there TCP connections are not completed. (Be very clear that while a target
+	  may not log a connection, you are still making digital "noise" that can be
+	  detected.)
+
+** Metasploit
+
+   'Metasploit is an exploitation and vulnerability validation tool
+   that helps you divide the penetration testing workflow into
+   manageable sections.'
+
+   There are several commands we use in metasploit, first we can list
+   all available exploits:
 

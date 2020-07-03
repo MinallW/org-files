@@ -1,0 +1,116 @@
+Information from Linux Networking guide
+
+* Networking Protocols
+
+  An important application in TCP/IP networks is NFS, allowing us to
+  mount directory hierarchies from other hosts, so that they appear
+  like local file systems. 
+
+  Another type of protocol is User Datagram Protocol (UDP). Just like
+  TCP, is allows an application to contact a service o na certain
+  port on the remote machine, but it doesn't establish a connection
+  for this. Instead, you may use it to send single packets to the
+  destination service.
+
+  Ports may be viewed as attachment points for network connections. If
+  an application wants to offer a certain service, it attaches itself
+  to a port and waits for clients. A client that want to use this
+  service allocates a port on its local host, and connects to the
+  server's port on the remote host.
+
+  Several connections can happend in one hosts, differenting them due
+  to the host they come.
+
+* The Socket Library
+
+  In OSs, the software performing all the tasks and protocols
+  described above is usually part of the kernel, and so it is in. The
+  programming interfae most common in the world is the Berkeley Socket
+  Library. Its name derives from a popular analogy that views ports as
+  sockets, and connecting to a port as plugging in. 
+
+* Maintaining Your System
+
+  After setting up a service, you have to keep it running, too. 
+
+  The absolute minimun in maintaenance is to check system and
+  per-application log files regularly for error conditions and unusual
+  events. Commonly, you will want to do this y writing a couple of
+  administrative shell scripts and run them from *cron* periodically.
+
+* System Security
+
+  An aspect of sysadmins in a network environment is protecting your
+  system and users from intruders. Carelessly managed systems offer
+  malicious people many targets: attacks range from password guessing
+  to Ethernet snooping, and the damage caused may range from faked
+  mail messages to data loss or violation of your user's privacy.
+
+  System security starts with good system adminsitration. This
+  includes checking the ownership and permissions of all vital files
+  and directories, monitoring use of privileged accounts. The *COPS*
+  program, for instance, will check your file system and common
+  configuration files for unusual permissions or other anomalies. It
+  is also wise to use a password suite that enforces certain rules on
+  the user's passwords that make them hard to guess.
+
+  When making a service accesible to the network, make sure to
+  fivegive it 'least privilege' meaning that you don't permit it to do
+  things that aren't required for it to work as designed. For example,
+  you should make programs setuid to root or some other privileged
+  account only when they really need it as restrictively as your
+  special application allows. For instance, if you want to allow
+  diskless hosts to boot from your machine, you must provide the TFTP
+  so that they can download basic configuration files from the /boot
+  directory. However, when used unrestricted, TFTP allows any user
+  anywhere in the world to download any world-readable file from your
+  system. If this is not what you want, why not restrict TFTP service
+  to the /boot directory?
+
+  Tools like *tripwire* allow us to check vital system files to see if
+  their contents or permissions have been changed.
+
+* TCP
+
+** Networking Interfaces
+
+   To hide the diversity of equipment that may be used in a networking
+   environment, TCP/IP defines an abstract /interface/ through which
+   the hardware is accessed. This interface offers a set of operations
+   which is the same for all types ofhardware and basically deals with
+   sending and receiving packets.
+
+   For each peripheral device you want to use for networking, a
+   corresponding interface has to be present in the kernel. For
+   example, Ethernet interfaces in are called eh0 and eh1, These
+   interface names are used for configuration purposes when you want
+   to name a particular physical device to the kernel. They have no
+   meaning beyond that.
+
+   And interface needs to be assigned an IP-address so it can be
+   identifiable to the rest of the world. There are other device
+   parameters to be set; one of these is the maximun size of datagrams
+   that can be processed by that particular piece of hardware, also
+   called /Maximum Transfer Unit/, or MTU.
+
+** Address Resolution Protocol
+
+   ARP is a communication protocol used for discoverint the link layer
+   address, such as a MAC address, associated with a given internet
+   layer address, tipically and IPv4 address. In IPv6 networks, the
+   functionality of ARP is provided by the Neighbor Discovery Protocol
+   or NDP.
+
+** The Internet Control Message Protocol
+
+   ICMP is used by the kernel networking code to communicate error
+   messages and the like to other hosts. There are quite a number of
+   messages ICMP understands, many of which deal with error
+   conditions. However, there is one interesting messaged called the
+   Redirect message, generated when the routing module detects that
+   another host is using it as a gateway, although there is a much
+   shorter route.
+
+   
+
+   
