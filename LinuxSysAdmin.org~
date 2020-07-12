@@ -1,0 +1,15 @@
+
+'A UNIX operating system consists of a /kernel/ and some /system
+programs/. There are also some /application programs/ for doing
+work. The kernel is the heart of the operating system. It keeps track
+of files on the disk, starts programs and runs them concurrently,
+assigns memory and other resources to various processes, receives
+packets from and sends packets to the network, and so on.
+
+The kernel does very little by itself, but it provides tools with
+which all services can be built. It also prevents anyone from
+accessing the hardware directly, forcing everyone to use the tools it
+provides. This way the kernel provides some protection for users from
+each other. The tools provided by the kernel are used via /system/
+/calls/.
+
